@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Recepción / Entrega de Vehículos</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f4fdf4;
+        margin: 0;
+        padding: 0;
+    }
+
+    header {
+        background: #00a64f;
+        padding: 25px;
+        text-align: center;
+        color: white;
+        font-size: 26px;
+        font-weight: bold;
+    }
+
+    .container {
+        max-width: 700px;
+        margin: 30px auto;
+        background: white;
+        padding: 25px;
+        border-radius: 10px;
+        border-top: 10px solid #00a64f;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    label {
+        display: block;
+        margin-top: 15px;
+        font-weight: bold;
+        color: #006b37;
+    }
+
+    input, textarea {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        border: 2px solid #00a64f;
+        border-radius: 6px;
+    }
+
+    input[type="file"] {
+        border: none;
+    }
+
+    button {
+        margin-top: 25px;
+        width: 100%;
+        padding: 15px;
+        background: #00a64f;
+        border: none;
+        color: white;
+        font-size: 18px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    button:hover {
+        background: #008c42;
+    }
+</style>
+
+</head>
+<body>
+
+<header>Registro de Recepción / Entrega</header>
+
+<div class="container">
+    <form id="formDatos">
+
+        <label>Nombre</label>
+        <input type="text" name="nombre" required>
+
+        <label>Usuario</label>
+        <input type="text" name="usuario" required>
+
+        <label>Placa</label>
+        <input type="text" name="placa" required>
+
+        <label>Kilometraje</label>
+        <input type="number" name="kilometraje" required>
+
+        <label>Comentarios</label>
+        <textarea name="comentarios" rows="3"></textarea>
+
+        <label>Foto Lado Derecho</label>
+        <input type="file" accept="image/*" id="fotoDerecho" required>
+
+        <label>Foto Lado Izquierdo</label>
+        <input type="file" accept="image/*" id="fotoIzquierdo" required>
+
+        <label>Foto Frente</label>
+        <input type="file" accept="image/*" id="fotoFrente" required>
+
+        <label>Foto Atrás</label>
+        <input type="file" accept="image/*" id="fotoAtras" required>
+
+        <label>Foto Interior</label>
+        <input type="file" accept="image/*" id="fotoInterior" required>
+
+        <button type="submit">Enviar Registro</button>
+    </form>
+
+    <p id="respuesta" style="margin-top:15px; font-weight:bold;"></p>
+</div>
+
+<script>
+
+// ⭐ TU WEB APP YA INSERTADO ⭐
+const webAppUrl = "https://script.google.com/macros/s/AKfycbzOToitOoKKR6OQqlshdjaWAuxRu1JluFRUHwdmjCAbwLZWPmYAkxbSn0fRADak3NE4nQ/exec";
+
+// convierte archivo a Base64
+function convertirBase64(file) {
+    return new Promise((resolve) => {
+        const lector = new FileReader();
+        lector.onload = () => resolve(lector.result);
+        lector.readAsDataURL(file);
+    });
+}
+
+document.getElementById("formDatos").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const form = e.target;
+    const data = {
+        nombre: form.nombre.value,
+        usuario: form.usuario.value,
+        placa: form.placa.value,
+        kilometraje: form.kilometraje.value,
+        comentarios: form.comentarios.value,
+        fotoDerecho: await convertirBase64(document.getElementById("fotoDerecho").files[0]),
+        fotoIzquierdo: await convertirBase64(document.getElementById("fotoIzquierdo").files[0]),
+        fotoFrente: await convertirBase64(document.getElementById("fotoFrente").files[0]),
+        fotoAtras: await convertirBase64(document.getElementById("fotoAtras").files[0]),
+        fotoInterior: await convertirBase64(document.getElementById("fotoInterior").files[0]),
+    };
+
+    document.getElementById("respuesta").innerText = "Enviando...";
+
+    const res = await fetch(webAppUrl, {
+        method: "POST",
+        body: JSON.stringify(data)
+    });
+
+    if (res.ok) {
+        document.getElementById("respuesta").innerText = "✔ Registro enviado correctamente.";
+        form.reset();
+    } else {
+        document.getElementById("respuesta").innerText = "❌ Error al enviar.";
+    }
+});
+</script>
+
+</body>
+</html>

@@ -387,7 +387,7 @@ document.getElementById("formDatos").addEventListener("submit", async (e) => {
         // Verificar respuesta
         if (res.ok || resultado.includes("success")) {
             respuesta.className = 'success';
-            respuesta.innerHTML = '✅ Registro enviado correctamente a Google Sheets<br>📁 Las imágenes se han guardado en Google Drive';
+            respuesta.innerHTML = '✅ Registro enviado correctamente <br>📁 Las imágenes se han guardado';
             form.reset();
         } else {
             throw new Error(resultado);
@@ -437,3 +437,4 @@ document.querySelector('input[name="placa"]').addEventListener('input', function
 
 </body>
 </html>
+

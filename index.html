@@ -2,168 +2,380 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Recepción / Entrega de Vehículos</title>
 
 <style>
-body {
-    font-family: Arial, sans-serif;
-    background: #f4fdf4;
-    margin: 0;
-    padding: 0;
-}
-header {
-    background: #00a64f;
-    padding: 25px;
-    text-align: center;
-    color: white;
-    font-size: 26px;
-    font-weight: bold;
-}
-.container {
-    max-width: 700px;
-    margin: 30px auto;
-    background: white;
-    padding: 25px;
-    border-radius: 10px;
-    border-top: 10px solid #00a64f;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
-label {
-    display: block;
-    margin-top: 15px;
-    font-weight: bold;
-    color: #006b37;
-}
-input, textarea, select {
-    width: 100%;
-    padding: 10px;
-    margin-top: 5px;
-    border: 2px solid #00a64f;
-    border-radius: 6px;
-}
-input[type="file"] {
-    border: none;
-}
-button {
-    margin-top: 25px;
-    width: 100%;
-    padding: 15px;
-    background: #00a64f;
-    border: none;
-    color: white;
-    font-size: 18px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-}
-button:hover {
-    background: #008c42;
-}
-</style>
-</head>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
 
+    body {
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #f4fdf4 0%, #e8f5e9 100%);
+        padding: 20px;
+    }
+
+    header {
+        background: linear-gradient(135deg, #00a64f 0%, #008c42 100%);
+        padding: 25px;
+        text-align: center;
+        color: white;
+        font-size: 28px;
+        font-weight: bold;
+        border-radius: 10px 10px 0 0;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .container {
+        max-width: 700px;
+        margin: 0 auto;
+        background: white;
+        padding: 30px;
+        border-radius: 0 0 10px 10px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .form-section {
+        margin-bottom: 25px;
+        padding: 20px;
+        background: #f9f9f9;
+        border-radius: 8px;
+        border-left: 4px solid #00a64f;
+    }
+
+    .form-section h3 {
+        color: #00a64f;
+        margin-bottom: 15px;
+        font-size: 18px;
+    }
+
+    label {
+        display: block;
+        margin-top: 15px;
+        font-weight: bold;
+        color: #006b37;
+        margin-bottom: 5px;
+    }
+
+    input, textarea, select {
+        width: 100%;
+        padding: 12px;
+        margin-top: 5px;
+        border: 2px solid #00a64f;
+        border-radius: 6px;
+        font-size: 14px;
+        transition: all 0.3s;
+    }
+
+    input:focus, textarea:focus, select:focus {
+        outline: none;
+        border-color: #008c42;
+        box-shadow: 0 0 0 3px rgba(0, 166, 79, 0.1);
+    }
+
+    input[type="file"] {
+        border: 2px dashed #00a64f;
+        padding: 15px;
+        cursor: pointer;
+        background: #f9f9f9;
+    }
+
+    input[type="file"]:hover {
+        background: #f0f0f0;
+    }
+
+    .file-preview {
+        margin-top: 10px;
+        display: none;
+    }
+
+    .file-preview img {
+        max-width: 150px;
+        max-height: 150px;
+        border-radius: 8px;
+        border: 2px solid #00a64f;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    button {
+        margin-top: 25px;
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(135deg, #00a64f 0%, #008c42 100%);
+        border: none;
+        color: white;
+        font-size: 18px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    button:hover {
+        background: linear-gradient(135deg, #008c42 0%, #006b37 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+
+    button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    #respuesta {
+        margin-top: 20px;
+        padding: 15px;
+        border-radius: 8px;
+        font-weight: bold;
+        text-align: center;
+        display: none;
+    }
+
+    #respuesta.success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+        display: block;
+    }
+
+    #respuesta.error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+        display: block;
+    }
+
+    #respuesta.loading {
+        background: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+        display: block;
+    }
+
+    .loading-spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(0,0,0,.1);
+        border-radius: 50%;
+        border-top-color: #00a64f;
+        animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .required {
+        color: #d32f2f;
+    }
+</style>
+
+</head>
 <body>
 
-<header>Registro de Recepción / Entrega</header>
+<header>🚗 Registro de Recepción / Entrega de Vehículos</header>
 
 <div class="container">
-<form id="formDatos">
+    <form id="formDatos">
+        
+        <div class="form-section">
+            <h3>📋 Información General</h3>
+            
+            <label>Tipo de Movimiento <span class="required">*</span></label>
+            <select name="movimiento" required>
+                <option value="">Selecciona una opción</option>
+                <option value="ENTRADA">🔵 ENTRADA</option>
+                <option value="SALIDA">🔴 SALIDA</option>
+            </select>
 
-    <label>Tipo de Registro</label>
-    <select name="tipo" required>
-        <option value="ENTRADA">ENTRADA</option>
-        <option value="SALIDA">SALIDA</option>
-    </select>
+            <label>Nombre Completo <span class="required">*</span></label>
+            <input type="text" name="nombre" required placeholder="Ej: Juan Pérez García">
 
-    <label>Nombre</label>
-    <input type="text" name="nombre" required>
+            <label>Usuario / ID <span class="required">*</span></label>
+            <input type="text" name="usuario" required placeholder="Ej: JPEREZ123">
 
-    <label>Usuario</label>
-    <input type="text" name="usuario" required>
+            <label>Placa del Vehículo <span class="required">*</span></label>
+            <input type="text" name="placa" required placeholder="Ej: ABC-123-XYZ" style="text-transform: uppercase;">
 
-    <label>Placa</label>
-    <input type="text" name="placa" required>
+            <label>Kilometraje <span class="required">*</span></label>
+            <input type="number" name="kilometraje" required placeholder="Ej: 15000" min="0">
 
-    <label>Kilometraje</label>
-    <input type="number" name="kilometraje" required>
+            <label>Comentarios / Observaciones</label>
+            <textarea name="comentarios" rows="4" placeholder="Describe el estado del vehículo, daños visibles, nivel de combustible, etc."></textarea>
+        </div>
 
-    <label>Comentarios</label>
-    <textarea name="comentarios" rows="3"></textarea>
+        <div class="form-section">
+            <h3>📸 Fotografías del Vehículo</h3>
+            <p style="color: #666; margin-bottom: 15px;">Todas las fotos son obligatorias. Formatos: JPG, PNG</p>
 
-    <label>Foto Lado Derecho</label>
-    <input type="file" accept="image/*" id="fotoDerecho" required>
+            <label>Foto Lado Derecho <span class="required">*</span></label>
+            <input type="file" accept="image/*" id="fotoDerecho" required>
+            <div class="file-preview" id="previewDerecho"></div>
 
-    <label>Foto Lado Izquierdo</label>
-    <input type="file" accept="image/*" id="fotoIzquierdo" required>
+            <label>Foto Lado Izquierdo <span class="required">*</span></label>
+            <input type="file" accept="image/*" id="fotoIzquierdo" required>
+            <div class="file-preview" id="previewIzquierdo"></div>
 
-    <label>Foto Frente</label>
-    <input type="file" accept="image/*" id="fotoFrente" required>
+            <label>Foto Frente <span class="required">*</span></label>
+            <input type="file" accept="image/*" id="fotoFrente" required>
+            <div class="file-preview" id="previewFrente"></div>
 
-    <label>Foto Atrás</label>
-    <input type="file" accept="image/*" id="fotoAtras" required>
+            <label>Foto Atrás <span class="required">*</span></label>
+            <input type="file" accept="image/*" id="fotoAtras" required>
+            <div class="file-preview" id="previewAtras"></div>
 
-    <label>Foto Interior</label>
-    <input type="file" accept="image/*" id="fotoInterior" required>
+            <label>Foto Interior <span class="required">*</span></label>
+            <input type="file" accept="image/*" id="fotoInterior" required>
+            <div class="file-preview" id="previewInterior"></div>
+        </div>
 
-    <button type="submit">Enviar Registro</button>
-</form>
+        <button type="submit" id="btnEnviar">📤 Enviar Registro</button>
+    </form>
 
-<p id="respuesta" style="margin-top:15px; font-weight:bold;"></p>
+    <div id="respuesta"></div>
 </div>
 
 <script>
-const webAppUrl = "https://script.google.com/macros/s/AKfycbyMSx7rt5uPJnu_py3VAtZnuGbtG2ml6h7jHBTTSSEA7IYTEaQ2RKDpSpEyJoGK9DZptg/exec";
+// IMPORTANTE: Reemplaza esta URL con la de tu Google Apps Script
+const webAppUrl = "https://script.google.com/macros/s/AKfycbwTHwiIWRkXSUZnwohe9fQhOHTZR3HT1t5fYA5YOHaJnq2DiIKnWu2jrSnDXEOuEeA/exec";
 
-// Convierte foto a Base64
+// Función para convertir imagen a Base64
 function convertirBase64(file) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         const lector = new FileReader();
         lector.onload = () => resolve(lector.result);
+        lector.onerror = (error) => reject(error);
         lector.readAsDataURL(file);
     });
 }
 
+// Previsualización de imágenes
+function setupPreview(inputId, previewId) {
+    const input = document.getElementById(inputId);
+    const preview = document.getElementById(previewId);
+    
+    input.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.innerHTML = `<img src="${e.target.result}" alt="Vista previa">`;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+}
+
+// Configurar previsualizaciones
+setupPreview('fotoDerecho', 'previewDerecho');
+setupPreview('fotoIzquierdo', 'previewIzquierdo');
+setupPreview('fotoFrente', 'previewFrente');
+setupPreview('fotoAtras', 'previewAtras');
+setupPreview('fotoInterior', 'previewInterior');
+
+// Manejo del formulario
 document.getElementById("formDatos").addEventListener("submit", async (e) => {
     e.preventDefault();
+
     const form = e.target;
+    const btnEnviar = document.getElementById("btnEnviar");
+    const respuesta = document.getElementById("respuesta");
 
-    document.getElementById("respuesta").innerText = "Enviando...";
-
-    const data = {
-        tipo: form.tipo.value,
-        nombre: form.nombre.value,
-        usuario: form.usuario.value,
-        placa: form.placa.value,
-        kilometraje: form.kilometraje.value,
-        comentarios: form.comentarios.value,
-
-        fotoDerecho: await convertirBase64(document.getElementById("fotoDerecho").files[0]),
-        fotoIzquierdo: await convertirBase64(document.getElementById("fotoIzquierdo").files[0]),
-        fotoFrente: await convertirBase64(document.getElementById("fotoFrente").files[0]),
-        fotoAtras: await convertirBase64(document.getElementById("fotoAtras").files[0]),
-        fotoInterior: await convertirBase64(document.getElementById("fotoInterior").files[0]),
-    };
+    // Deshabilitar botón y mostrar loading
+    btnEnviar.disabled = true;
+    btnEnviar.innerHTML = '<span class="loading-spinner"></span> Enviando...';
+    respuesta.className = 'loading';
+    respuesta.innerHTML = '⏳ Procesando imágenes y enviando datos...';
 
     try {
+        // Obtener fecha y hora actual
+        const ahora = new Date();
+        const fecha = ahora.toLocaleDateString('es-MX');
+        const hora = ahora.toLocaleTimeString('es-MX');
+
+        // Preparar datos con las fotos en Base64
+        const data = {
+            fecha: fecha,
+            hora: hora,
+            movimiento: form.movimiento.value,
+            nombre: form.nombre.value,
+            usuario: form.usuario.value,
+            placa: form.placa.value.toUpperCase(),
+            kilometraje: form.kilometraje.value,
+            comentarios: form.comentarios.value,
+            fotoDerecho: await convertirBase64(document.getElementById("fotoDerecho").files[0]),
+            fotoIzquierdo: await convertirBase64(document.getElementById("fotoIzquierdo").files[0]),
+            fotoFrente: await convertirBase64(document.getElementById("fotoFrente").files[0]),
+            fotoAtras: await convertirBase64(document.getElementById("fotoAtras").files[0]),
+            fotoInterior: await convertirBase64(document.getElementById("fotoInterior").files[0])
+        };
+
+        // Enviar a Google Apps Script
         const res = await fetch(webAppUrl, {
             method: "POST",
-            mode: "cors",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "text/plain"
+            },
             body: JSON.stringify(data)
         });
 
-        const texto = await res.text();
-
-        if (res.ok) {
-            document.getElementById("respuesta").innerText = "✔ Registro enviado correctamente.";
+        const resultado = await res.text();
+        
+        // Verificar respuesta
+        if (res.ok || resultado.includes("success")) {
+            respuesta.className = 'success';
+            respuesta.innerHTML = '✅ Registro enviado correctamente a Google Sheets<br>📁 Las imágenes se han guardado en Google Drive';
             form.reset();
         } else {
-            document.getElementById("respuesta").innerText = "❌ Error del servidor: " + texto;
+            throw new Error(resultado);
         }
+        
+        // Limpiar previsualizaciones
+        document.querySelectorAll('.file-preview').forEach(preview => {
+            preview.style.display = 'none';
+            preview.innerHTML = '';
+        });
+
+        // Resetear botón después de 2 segundos
+        setTimeout(() => {
+            btnEnviar.disabled = false;
+            btnEnviar.innerHTML = '📤 Enviar Registro';
+        }, 2000);
 
     } catch (err) {
-        document.getElementById("respuesta").innerText = "❌ Error de conexión: " + err;
+        console.error('Error:', err);
+        respuesta.className = 'error';
+        respuesta.innerHTML = '❌ Error al enviar: ' + err.message;
+        
+        btnEnviar.disabled = false;
+        btnEnviar.innerHTML = '📤 Enviar Registro';
     }
+});
+
+// Validación de tamaño de archivo
+document.querySelectorAll('input[type="file"]').forEach(input => {
+    input.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            // Limitar a 5MB por imagen
+            if (file.size > 5 * 1024 * 1024) {
+                alert('⚠️ La imagen es muy grande. Por favor, elige una imagen menor a 5MB.');
+                e.target.value = '';
+            }
+        }
+    });
+});
+
+// Convertir placa a mayúsculas automáticamente
+document.querySelector('input[name="placa"]').addEventListener('input', function(e) {
+    e.target.value = e.target.value.toUpperCase();
 });
 </script>
 

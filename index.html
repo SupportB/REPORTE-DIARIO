@@ -174,6 +174,44 @@
     .required {
         color: #d32f2f;
     }
+    
+    .camera-icon {
+        display: inline-block;
+        margin-right: 8px;
+        font-size: 20px;
+    }
+    
+    .btn-camera {
+        background: #007bff;
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 10px;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .btn-camera:hover {
+        background: #0056b3;
+    }
+    
+    .permissions-warning {
+        background: #fff3cd;
+        border: 1px solid #ffc107;
+        color: #856404;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: none;
+    }
+    
+    .permissions-warning.show {
+        display: block;
+    }
 </style>
 
 </head>
@@ -182,6 +220,17 @@
 <header>🚗 Registro de Recepción / Entrega de Vehículos</header>
 
 <div class="container">
+    <!-- Alerta de permisos -->
+    <div class="permissions-warning" id="permissionsWarning">
+        <strong>⚠️ Permisos de Cámara Requeridos</strong>
+        <p>Para tomar fotos, necesitas permitir el acceso a la cámara en tu dispositivo:</p>
+        <ul style="margin: 10px 0; padding-left: 20px;">
+            <li><strong>iOS/Safari:</strong> Ve a Ajustes → Safari → Cámara → Permitir</li>
+            <li><strong>Android/Chrome:</strong> Ve a Configuración → Sitios → Permisos de cámara → Permitir</li>
+        </ul>
+        <button onclick="document.getElementById('permissionsWarning').classList.remove('show')" style="margin-top:10px; padding:8px 15px; background:#ffc107; border:none; border-radius:5px; cursor:pointer;">Entendido</button>
+    </div>
+    
     <form id="formDatos">
         
         <div class="form-section">
@@ -201,7 +250,7 @@
             <input type="text" name="usuario" required placeholder="Ej: JPEREZ123">
 
             <label>Placa del Vehículo <span class="required">*</span></label>
-            <input type="text" name="placa" required placeholder="Ej: ABC-123-XYZ" style="text-transform: uppercase;">
+            <input type="text" name="placa" required placeholder="Ej: ABC123XYZ" style="text-transform: uppercase;">
 
             <label>Kilometraje <span class="required">*</span></label>
             <input type="number" name="kilometraje" required placeholder="Ej: 15000" min="0">
@@ -215,24 +264,29 @@
             <p style="color: #666; margin-bottom: 15px;">Todas las fotos son obligatorias. Formatos: JPG, PNG</p>
 
             <label>Foto Lado Derecho <span class="required">*</span></label>
-            <input type="file" accept="image/*" id="fotoDerecho" required>
+            <input type="file" accept="image/*" capture="environment" id="fotoDerecho" required>
             <div class="file-preview" id="previewDerecho"></div>
 
             <label>Foto Lado Izquierdo <span class="required">*</span></label>
-            <input type="file" accept="image/*" id="fotoIzquierdo" required>
+            <input type="file" accept="image/*" capture="environment" id="fotoIzquierdo" required>
             <div class="file-preview" id="previewIzquierdo"></div>
 
             <label>Foto Frente <span class="required">*</span></label>
-            <input type="file" accept="image/*" id="fotoFrente" required>
+            <input type="file" accept="image/*" capture="environment" id="fotoFrente" required>
             <div class="file-preview" id="previewFrente"></div>
 
-            <label>Foto Atrás <span class="required">*</span></label>
-            <input type="file" accept="image/*" id="fotoAtras" required>
+            <label>Foto Atrás (Caja / Cajuela) <span class="required">*</span></label>
+            <input type="file" accept="image/*" capture="environment" id="fotoAtras" required>
             <div class="file-preview" id="previewAtras"></div>
 
-            <label>Foto Interior <span class="required">*</span></label>
-            <input type="file" accept="image/*" id="fotoInterior" required>
+            <label>Foto Interior  <span class="required">*</span></label>
+            <input type="file" accept="image/*" capture="environment" id="fotoInterior" required>
             <div class="file-preview" id="previewInterior"></div>
+
+            <label>Foto Tablero  <span class="required">*</span></label>
+            <input type="file" accept="image/*" capture="environment" id="fotoTablero" required>
+            <div class="file-preview" id="previewInterior"></div>
+           
         </div>
 
         <button type="submit" id="btnEnviar">📤 Enviar Registro</button>
@@ -279,6 +333,7 @@ setupPreview('fotoIzquierdo', 'previewIzquierdo');
 setupPreview('fotoFrente', 'previewFrente');
 setupPreview('fotoAtras', 'previewAtras');
 setupPreview('fotoInterior', 'previewInterior');
+setupPreview('fotoTablero', 'previewInterior');
 
 // Manejo del formulario
 document.getElementById("formDatos").addEventListener("submit", async (e) => {
@@ -314,7 +369,8 @@ document.getElementById("formDatos").addEventListener("submit", async (e) => {
             fotoIzquierdo: await convertirBase64(document.getElementById("fotoIzquierdo").files[0]),
             fotoFrente: await convertirBase64(document.getElementById("fotoFrente").files[0]),
             fotoAtras: await convertirBase64(document.getElementById("fotoAtras").files[0]),
-            fotoInterior: await convertirBase64(document.getElementById("fotoInterior").files[0])
+            fotoInterior: await convertirBase64(document.getElementById("fotoInterior").files[0]),
+            fotoTablero: await convertirBase64(document.getElementById("fotoTablero").files[0])
         };
 
         // Enviar a Google Apps Script

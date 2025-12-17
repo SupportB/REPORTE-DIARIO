@@ -250,7 +250,7 @@
             <input type="text" name="usuario" required placeholder="Ej: JPEREZ123">
 
             <label>Placa del Vehículo <span class="required">*</span></label>
-            <input type="text" name="placa" required placeholder="Ej: ABC123XYZ" style="text-transform: uppercase;">
+            <input type="text" name="placa" required placeholder="Ej: ABC-123-XYZ" style="text-transform: uppercase;">
 
             <label>Kilometraje <span class="required">*</span></label>
             <input type="number" name="kilometraje" required placeholder="Ej: 15000" min="0">
@@ -260,33 +260,33 @@
         </div>
 
         <div class="form-section">
-            <h3>📸 Fotografías del Vehículo</h3>
-            <p style="color: #666; margin-bottom: 15px;">Todas las fotos son obligatorias. Formatos: JPG, PNG</p>
+            <h3>📸 Fotografías del Vehículo (6 fotos obligatorias)</h3>
+            <p style="color: #666; margin-bottom: 15px;">Todas las fotos son obligatorias. Formatos: JPG, PNG - Máximo 5MB por foto</p>
 
-            <label>Foto Lado Derecho <span class="required">*</span></label>
+            <label>1️⃣ Foto Lado Derecho <span class="required">*</span></label>
             <input type="file" accept="image/*" capture="environment" id="fotoDerecho" required>
             <div class="file-preview" id="previewDerecho"></div>
 
-            <label>Foto Lado Izquierdo <span class="required">*</span></label>
+            <label>2️⃣ Foto Lado Izquierdo <span class="required">*</span></label>
             <input type="file" accept="image/*" capture="environment" id="fotoIzquierdo" required>
             <div class="file-preview" id="previewIzquierdo"></div>
 
-            <label>Foto Frente <span class="required">*</span></label>
+            <label>3️⃣ Foto Frente <span class="required">*</span></label>
             <input type="file" accept="image/*" capture="environment" id="fotoFrente" required>
             <div class="file-preview" id="previewFrente"></div>
 
-            <label>Foto Atrás (Caja / Cajuela) <span class="required">*</span></label>
+            <label>4️⃣ Foto Atrás <span class="required">*</span></label>
             <input type="file" accept="image/*" capture="environment" id="fotoAtras" required>
             <div class="file-preview" id="previewAtras"></div>
 
-            <label>Foto Interior  <span class="required">*</span></label>
+            <label>5️⃣ Foto Interior <span class="required">*</span></label>
             <input type="file" accept="image/*" capture="environment" id="fotoInterior" required>
             <div class="file-preview" id="previewInterior"></div>
 
-            <label>Foto Tablero  <span class="required">*</span></label>
+            <label>6️⃣ Foto Tablero / Panel de Control <span class="required">*</span></label>
             <input type="file" accept="image/*" capture="environment" id="fotoTablero" required>
-            <div class="file-preview" id="previewInterior"></div>
-           
+            <div class="file-preview" id="previewTablero"></div>
+        </div>
         </div>
 
         <button type="submit" id="btnEnviar">📤 Enviar Registro</button>
@@ -297,7 +297,7 @@
 
 <script>
 // IMPORTANTE: Reemplaza esta URL con la de tu Google Apps Script
-const webAppUrl = "https://script.google.com/macros/s/AKfycbwTHwiIWRkXSUZnwohe9fQhOHTZR3HT1t5fYA5YOHaJnq2DiIKnWu2jrSnDXEOuEeA/exec";
+const webAppUrl = "https://script.google.com/macros/s/AKfycbzP7GIDucSqiwuJ4me728_aC6tZ2J4bLRX1dKYa1qwRUnCcMbU71tkVrVIAvQdlT4fGmA/exec";
 
 // Función para convertir imagen a Base64
 function convertirBase64(file) {
@@ -333,7 +333,7 @@ setupPreview('fotoIzquierdo', 'previewIzquierdo');
 setupPreview('fotoFrente', 'previewFrente');
 setupPreview('fotoAtras', 'previewAtras');
 setupPreview('fotoInterior', 'previewInterior');
-setupPreview('fotoTablero', 'previewInterior');
+setupPreview('fotoTablero', 'previewTablero');
 
 // Manejo del formulario
 document.getElementById("formDatos").addEventListener("submit", async (e) => {
@@ -387,7 +387,7 @@ document.getElementById("formDatos").addEventListener("submit", async (e) => {
         // Verificar respuesta
         if (res.ok || resultado.includes("success")) {
             respuesta.className = 'success';
-            respuesta.innerHTML = '✅ Registro enviado correctamente <br>📁 Las imágenes se han guardado';
+            respuesta.innerHTML = '✅ Registro enviado correctamente a Google Sheets<br>📁 Las imágenes se han guardado en Google Drive';
             form.reset();
         } else {
             throw new Error(resultado);
@@ -437,4 +437,3 @@ document.querySelector('input[name="placa"]').addEventListener('input', function
 
 </body>
 </html>
-

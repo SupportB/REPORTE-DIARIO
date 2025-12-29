@@ -6,432 +6,364 @@
 <title>Recepción / Entrega de Vehículos</title>
 
 <style>
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-    }
-
-    body {
-        font-family: Arial, sans-serif;
-        background: linear-gradient(135deg, #f4fdf4 0%, #e8f5e9 100%);
-        padding: 20px;
-    }
-
-    header {
-        background: linear-gradient(135deg, #00a64f 0%, #008c42 100%);
-        padding: 25px;
-        text-align: center;
-        color: white;
-        font-size: 28px;
-        font-weight: bold;
-        border-radius: 10px 10px 0 0;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-
-    .container {
-        max-width: 700px;
-        margin: 0 auto;
-        background: white;
-        padding: 30px;
-        border-radius: 0 0 10px 10px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    }
-
-    .form-section {
-        margin-bottom: 25px;
-        padding: 20px;
-        background: #f9f9f9;
-        border-radius: 8px;
-        border-left: 4px solid #00a64f;
-    }
-
-    .form-section h3 {
-        color: #00a64f;
-        margin-bottom: 15px;
-        font-size: 18px;
-    }
-
-    label {
-        display: block;
-        margin-top: 15px;
-        font-weight: bold;
-        color: #006b37;
-        margin-bottom: 5px;
-    }
-
-    input, textarea, select {
-        width: 100%;
-        padding: 12px;
-        margin-top: 5px;
-        border: 2px solid #00a64f;
-        border-radius: 6px;
-        font-size: 14px;
-        transition: all 0.3s;
-    }
-
-    input:focus, textarea:focus, select:focus {
-        outline: none;
-        border-color: #008c42;
-        box-shadow: 0 0 0 3px rgba(0, 166, 79, 0.1);
-    }
-
-    input[type="file"] {
-        border: 2px dashed #00a64f;
-        padding: 15px;
-        cursor: pointer;
-        background: #f9f9f9;
-    }
-
-    input[type="file"]:hover {
-        background: #f0f0f0;
-    }
-
-    .file-preview {
-        margin-top: 10px;
-        display: none;
-    }
-
-    .file-preview img {
-        max-width: 150px;
-        max-height: 150px;
-        border-radius: 8px;
-        border: 2px solid #00a64f;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-
-    button {
-        margin-top: 25px;
-        width: 100%;
-        padding: 15px;
-        background: linear-gradient(135deg, #00a64f 0%, #008c42 100%);
-        border: none;
-        color: white;
-        font-size: 18px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-weight: bold;
-        transition: all 0.3s;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-
-    button:hover {
-        background: linear-gradient(135deg, #008c42 0%, #006b37 100%);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-    }
-
-    button:disabled {
-        background: #ccc;
-        cursor: not-allowed;
-        transform: none;
-    }
-
-    #respuesta {
-        margin-top: 20px;
-        padding: 15px;
-        border-radius: 8px;
-        font-weight: bold;
-        text-align: center;
-        display: none;
-    }
-
-    #respuesta.success {
-        background: #d4edda;
-        color: #155724;
-        border: 1px solid #c3e6cb;
-        display: block;
-    }
-
-    #respuesta.error {
-        background: #f8d7da;
-        color: #721c24;
-        border: 1px solid #f5c6cb;
-        display: block;
-    }
-
-    #respuesta.loading {
-        background: #d1ecf1;
-        color: #0c5460;
-        border: 1px solid #bee5eb;
-        display: block;
-    }
-
-    .loading-spinner {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        border: 3px solid rgba(0,0,0,.1);
-        border-radius: 50%;
-        border-top-color: #00a64f;
-        animation: spin 1s ease-in-out infinite;
-    }
-
-    @keyframes spin {
-        to { transform: rotate(360deg); }
-    }
-
-    .required {
-        color: #d32f2f;
-    }
-    
-    .camera-icon {
-        display: inline-block;
-        margin-right: 8px;
-        font-size: 20px;
-    }
-    
-    .btn-camera {
-        background: #007bff;
-        color: white;
-        padding: 10px 15px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        margin-top: 10px;
-        font-size: 14px;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-    }
-    
-    .btn-camera:hover {
-        background: #0056b3;
-    }
-    
-    .permissions-warning {
-        background: #fff3cd;
-        border: 1px solid #ffc107;
-        color: #856404;
-        padding: 15px;
-        border-radius: 8px;
-        margin-bottom: 20px;
-        display: none;
-    }
-    
-    .permissions-warning.show {
-        display: block;
-    }
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:linear-gradient(135deg,#f4fdf4,#e8f5e9);padding:20px}
+header{background:linear-gradient(135deg,#00a64f,#008c42);padding:25px;text-align:center;color:#fff;font-size:26px;font-weight:bold;border-radius:10px 10px 0 0}
+.container{max-width:700px;margin:auto;background:#fff;padding:30px;border-radius:0 0 10px 10px}
+.form-section{margin-bottom:25px;padding:20px;background:#f9f9f9;border-radius:8px;border-left:4px solid #00a64f}
+label{display:block;margin-top:15px;font-weight:bold;color:#006b37}
+input,textarea,select{width:100%;padding:12px;border:2px solid #00a64f;border-radius:6px}
+input[type=file]{border:2px dashed #00a64f;background:#f9f9f9}
+.file-preview{display:none;margin-top:10px}
+.file-preview img{max-width:150px;border-radius:8px;border:2px solid #00a64f}
+button{margin-top:25px;width:100%;padding:15px;background:#00a64f;border:none;color:#fff;font-size:18px;border-radius:8px;cursor:pointer}
+button:disabled{background:#ccc}
+.required{color:#d32f2f}
+.permissions-warning{display:none;background:#fff3cd;border:1px solid #ffc107;color:#856404;padding:15px;border-radius:8px;margin-bottom:15px}
+.permissions-warning.show{display:block}
+#respuesta{margin-top:20px;padding:15px;border-radius:8px;font-weight:bold;text-align:center;display:none}
+#respuesta.success{background:#d4edda;color:#155724;display:block}
+#respuesta.error{background:#f8d7da;color:#721c24;display:block}
+#respuesta.loading{background:#d1ecf1;color:#0c5460;display:block}
+.autocomplete-container{position:relative}
+.autocomplete-list{position:absolute;top:100%;left:0;right:0;max-height:200px;overflow-y:auto;background:#fff;border:2px solid #00a64f;border-top:none;border-radius:0 0 6px 6px;z-index:100;display:none}
+.autocomplete-item{padding:12px;cursor:pointer;border-bottom:1px solid #e0e0e0}
+.autocomplete-item:hover{background:#e8f5e9}
+.autocomplete-item:last-child{border-bottom:none}
+.autocomplete-no-results{padding:12px;color:#666;font-style:italic;text-align:center}
+.tiempo-uso{background:#fff9c4;border:2px solid #fbc02d;padding:20px;border-radius:8px;margin-top:20px;display:none}
+.tiempo-uso h3{color:#f57f17;margin-bottom:10px;font-size:20px}
+.tiempo-uso .detalle{font-size:16px;margin:8px 0;color:#333}
+.tiempo-uso .detalle strong{color:#f57f17}
+.tiempo-uso .destacado{font-size:24px;font-weight:bold;color:#e65100;margin-top:15px;padding:10px;background:#fff;border-radius:6px;text-align:center}
 </style>
-
 </head>
+
 <body>
 
 <header>🚗 Registro de Recepción / Entrega de Vehículos</header>
 
 <div class="container">
-    <!-- Alerta de permisos -->
-    <div class="permissions-warning" id="permissionsWarning">
-        <strong>⚠️ Permisos de Cámara Requeridos</strong>
-        <p>Para tomar fotos, necesitas permitir el acceso a la cámara en tu dispositivo:</p>
-        <ul style="margin: 10px 0; padding-left: 20px;">
-            <li><strong>iOS/Safari:</strong> Ve a Ajustes → Safari → Cámara → Permitir</li>
-            <li><strong>Android/Chrome:</strong> Ve a Configuración → Sitios → Permisos de cámara → Permitir</li>
-        </ul>
-        <button onclick="document.getElementById('permissionsWarning').classList.remove('show')" style="margin-top:10px; padding:8px 15px; background:#ffc107; border:none; border-radius:5px; cursor:pointer;">Entendido</button>
-    </div>
-    
-    <form id="formDatos">
-        
-        <div class="form-section">
-            <h3>📋 Información General</h3>
-            
-            <label>Tipo de Movimiento <span class="required">*</span></label>
-            <select name="movimiento" required>
-                <option value="">Selecciona una opción</option>
-                <option value="ENTRADA">🔵 ENTRADA</option>
-                <option value="SALIDA">🔴 SALIDA</option>
-            </select>
 
-            <label>Nombre Completo <span class="required">*</span></label>
-            <input type="text" name="nombre" required placeholder="Ej: Juan Pérez García">
+<div class="permissions-warning" id="gpsWarning">
+<strong>📍 Ubicación requerida</strong>
+<p>Debes permitir la ubicación para enviar el registro.</p>
+<p><b>Sin GPS no se puede continuar.</b></p>
+</div>
 
-            <label>Usuario / ID <span class="required">*</span></label>
-            <input type="text" name="usuario" required placeholder="Ej: JPEREZ123">
+<form id="formDatos">
 
-            <label>Placa del Vehículo <span class="required">*</span></label>
-            <input type="text" name="placa" required placeholder="Ej: ABC-123-XYZ" style="text-transform: uppercase;">
+<div class="form-section">
+<h3>📋 Información General</h3>
 
-            <label>Kilometraje <span class="required">*</span></label>
-            <input type="number" name="kilometraje" required placeholder="Ej: 15000" min="0">
+<label>Movimiento <span class="required">*</span></label>
+<select name="movimiento" required>
+<option value="">Selecciona</option>
+<option>ENTRADA</option>
+<option>SALIDA</option>
+</select>
 
-            <label>Comentarios / Observaciones</label>
-            <textarea name="comentarios" rows="4" placeholder="Describe el estado del vehículo, daños visibles, nivel de combustible, etc."></textarea>
-        </div>
+<label>Nombre <span class="required">*</span></label>
+<input name="nombre" required>
 
-        <div class="form-section">
-            <h3>📸 Fotografías del Vehículo (6 fotos obligatorias)</h3>
-            <p style="color: #666; margin-bottom: 15px;">Todas las fotos son obligatorias. Formatos: JPG, PNG - Máximo 5MB por foto</p>
+<label>Usuario <span class="required">*</span></label>
+<input name="usuario" required>
 
-            <label>1️⃣ Foto Lado Derecho <span class="required">*</span></label>
-            <input type="file" accept="image/*" capture="environment" id="fotoDerecho" required>
-            <div class="file-preview" id="previewDerecho"></div>
+<label>Tienda <span class="required">*</span></label>
+<input name="tienda" required>
 
-            <label>2️⃣ Foto Lado Izquierdo <span class="required">*</span></label>
-            <input type="file" accept="image/*" capture="environment" id="fotoIzquierdo" required>
-            <div class="file-preview" id="previewIzquierdo"></div>
+<label>Placa <span class="required">*</span></label>
+<div class="autocomplete-container">
+<input name="placa" id="inputPlaca" required style="text-transform:uppercase" autocomplete="off" placeholder="Escribe la placa...">
+<div class="autocomplete-list" id="listaPlacas"></div>
+</div>
 
-            <label>3️⃣ Foto Frente <span class="required">*</span></label>
-            <input type="file" accept="image/*" capture="environment" id="fotoFrente" required>
-            <div class="file-preview" id="previewFrente"></div>
+<label>Marca y Submarca <span class="required">*</span></label>
+<select name="marca_y_submarca" id="selectMarca" required disabled>
+<option value="">Primero selecciona una placa</option>
+</select>
 
-            <label>4️⃣ Foto Atrás <span class="required">*</span></label>
-            <input type="file" accept="image/*" capture="environment" id="fotoAtras" required>
-            <div class="file-preview" id="previewAtras"></div>
+<label>Kilometraje <span class="required">*</span></label>
+<input type="number" name="kilometraje" required>
 
-            <label>5️⃣ Foto Interior <span class="required">*</span></label>
-            <input type="file" accept="image/*" capture="environment" id="fotoInterior" required>
-            <div class="file-preview" id="previewInterior"></div>
+<label>Comentarios <span class="required">*</span></label>
+<textarea name="comentarios" required></textarea>
+</div>
 
-            <label>6️⃣ Foto Tablero / Panel de Control <span class="required">*</span></label>
-            <input type="file" accept="image/*" capture="environment" id="fotoTablero" required>
-            <div class="file-preview" id="previewTablero"></div>
-        </div>
-        </div>
+<div class="form-section">
+<h3>📸 Fotografías obligatorias</h3>
 
-        <button type="submit" id="btnEnviar">📤 Enviar Registro</button>
-    </form>
+<label>1️⃣ Lado Derecho <span class="required">*</span></label>
+<input type="file" id="fotoDerecho" accept="image/*" capture required>
+<div class="file-preview" id="previewDerecho"></div>
 
-    <div id="respuesta"></div>
+<label>2️⃣ Lado Izquierdo <span class="required">*</span></label>
+<input type="file" id="fotoIzquierdo" accept="image/*" capture required>
+<div class="file-preview" id="previewIzquierdo"></div>
+
+<label>3️⃣ Frente <span class="required">*</span></label>
+<input type="file" id="fotoFrente" accept="image/*" capture required>
+<div class="file-preview" id="previewFrente"></div>
+
+<label>4️⃣ Atrás <span class="required">*</span></label>
+<input type="file" id="fotoAtras" accept="image/*" capture required>
+<div class="file-preview" id="previewAtras"></div>
+
+<label>5️⃣ Interior <span class="required">*</span></label>
+<input type="file" id="fotoInterior" accept="image/*" capture required>
+<div class="file-preview" id="previewInterior"></div>
+
+<label>6️⃣ Tablero <span class="required">*</span></label>
+<input type="file" id="fotoTablero" accept="image/*" capture required>
+<div class="file-preview" id="previewTablero"></div>
+
+<label>7️⃣ Licencia <span class="required">*</span></label>
+<input type="file" id="fotoLicencia" accept="image/*" capture required>
+<div class="file-preview" id="previewLicencia"></div>
+
+<label>8️⃣ Tarjeta de Circulación <span class="required">*</span></label>
+<input type="file" id="fotoCirculacion" accept="image/*" capture required>
+<div class="file-preview" id="previewCirculacion"></div>
+
+</div>
+
+<button id="btnEnviar">📤 Enviar Registro</button>
+</form>
+
+<div id="respuesta"></div>
+<div class="tiempo-uso" id="tiempoUso"></div>
 </div>
 
 <script>
-// IMPORTANTE: Reemplaza esta URL con la de tu Google Apps Script
-const webAppUrl = "https://script.google.com/macros/s/AKfycbzP7GIDucSqiwuJ4me728_aC6tZ2J4bLRX1dKYa1qwRUnCcMbU71tkVrVIAvQdlT4fGmA/exec";
+const webAppUrl = "https://script.google.com/macros/s/AKfycbwpz-KfDJNPjT_u2LBT6eP4gClQ2WsbEfa160fTLlHWcqivDyTM3eUnmMzEE9CdItmJ/exec";
+let vehiculosData = [];
 
-// Función para convertir imagen a Base64
-function convertirBase64(file) {
-    return new Promise((resolve, reject) => {
-        const lector = new FileReader();
-        lector.onload = () => resolve(lector.result);
-        lector.onerror = (error) => reject(error);
-        lector.readAsDataURL(file);
+// Cargar vehículos y verificar permisos al iniciar
+window.addEventListener("load", async () => {
+  // Solicitar permiso de ubicación
+  try {
+    await new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(
+        () => {
+          document.getElementById("gpsWarning").classList.remove("show");
+          resolve();
+        },
+        () => {
+          document.getElementById("gpsWarning").classList.add("show");
+          reject();
+        },
+        {enableHighAccuracy: true}
+      );
     });
-}
-
-// Previsualización de imágenes
-function setupPreview(inputId, previewId) {
-    const input = document.getElementById(inputId);
-    const preview = document.getElementById(previewId);
-    
-    input.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                preview.innerHTML = `<img src="${e.target.result}" alt="Vista previa">`;
-                preview.style.display = 'block';
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-}
-
-// Configurar previsualizaciones
-setupPreview('fotoDerecho', 'previewDerecho');
-setupPreview('fotoIzquierdo', 'previewIzquierdo');
-setupPreview('fotoFrente', 'previewFrente');
-setupPreview('fotoAtras', 'previewAtras');
-setupPreview('fotoInterior', 'previewInterior');
-setupPreview('fotoTablero', 'previewTablero');
-
-// Manejo del formulario
-document.getElementById("formDatos").addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const form = e.target;
-    const btnEnviar = document.getElementById("btnEnviar");
-    const respuesta = document.getElementById("respuesta");
-
-    // Deshabilitar botón y mostrar loading
-    btnEnviar.disabled = true;
-    btnEnviar.innerHTML = '<span class="loading-spinner"></span> Enviando...';
-    respuesta.className = 'loading';
-    respuesta.innerHTML = '⏳ Procesando imágenes y enviando datos...';
-
-    try {
-        // Obtener fecha y hora actual
-        const ahora = new Date();
-        const fecha = ahora.toLocaleDateString('es-MX');
-        const hora = ahora.toLocaleTimeString('es-MX');
-
-        // Preparar datos con las fotos en Base64
-        const data = {
-            fecha: fecha,
-            hora: hora,
-            movimiento: form.movimiento.value,
-            nombre: form.nombre.value,
-            usuario: form.usuario.value,
-            placa: form.placa.value.toUpperCase(),
-            kilometraje: form.kilometraje.value,
-            comentarios: form.comentarios.value,
-            fotoDerecho: await convertirBase64(document.getElementById("fotoDerecho").files[0]),
-            fotoIzquierdo: await convertirBase64(document.getElementById("fotoIzquierdo").files[0]),
-            fotoFrente: await convertirBase64(document.getElementById("fotoFrente").files[0]),
-            fotoAtras: await convertirBase64(document.getElementById("fotoAtras").files[0]),
-            fotoInterior: await convertirBase64(document.getElementById("fotoInterior").files[0]),
-            fotoTablero: await convertirBase64(document.getElementById("fotoTablero").files[0])
-        };
-
-        // Enviar a Google Apps Script
-        const res = await fetch(webAppUrl, {
-            method: "POST",
-            headers: {
-                "Content-Type": "text/plain"
-            },
-            body: JSON.stringify(data)
-        });
-
-        const resultado = await res.text();
-        
-        // Verificar respuesta
-        if (res.ok || resultado.includes("success")) {
-            respuesta.className = 'success';
-            respuesta.innerHTML = '✅ Registro enviado correctamente a Google Sheets<br>📁 Las imágenes se han guardado en Google Drive';
-            form.reset();
-        } else {
-            throw new Error(resultado);
-        }
-        
-        // Limpiar previsualizaciones
-        document.querySelectorAll('.file-preview').forEach(preview => {
-            preview.style.display = 'none';
-            preview.innerHTML = '';
-        });
-
-        // Resetear botón después de 2 segundos
-        setTimeout(() => {
-            btnEnviar.disabled = false;
-            btnEnviar.innerHTML = '📤 Enviar Registro';
-        }, 2000);
-
-    } catch (err) {
-        console.error('Error:', err);
-        respuesta.className = 'error';
-        respuesta.innerHTML = '❌ Error al enviar: ' + err.message;
-        
-        btnEnviar.disabled = false;
-        btnEnviar.innerHTML = '📤 Enviar Registro';
-    }
+  } catch (error) {
+    console.log("Permiso de ubicación denegado");
+  }
+  
+  // Cargar vehículos
+  try {
+    const response = await fetch(webAppUrl + "?action=getVehiculos");
+    vehiculosData = await response.json();
+    console.log("Vehículos cargados:", vehiculosData.length);
+  } catch (error) {
+    console.error("Error cargando vehículos:", error);
+  }
 });
 
-// Validación de tamaño de archivo
-document.querySelectorAll('input[type="file"]').forEach(input => {
-    input.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            // Limitar a 5MB por imagen
-            if (file.size > 5 * 1024 * 1024) {
-                alert('⚠️ La imagen es muy grande. Por favor, elige una imagen menor a 5MB.');
-                e.target.value = '';
-            }
-        }
+// Autocompletado de placas
+const inputPlaca = document.getElementById("inputPlaca");
+const listaPlacas = document.getElementById("listaPlacas");
+const selectMarca = document.getElementById("selectMarca");
+
+inputPlaca.addEventListener("input", (e) => {
+  const valor = e.target.value.toUpperCase();
+  inputPlaca.value = valor;
+  
+  if (valor.length === 0) {
+    listaPlacas.style.display = "none";
+    selectMarca.disabled = true;
+    selectMarca.innerHTML = '<option value="">Primero selecciona una placa</option>';
+    return;
+  }
+  
+  const filtrados = vehiculosData.filter(v => 
+    v.placa.toUpperCase().includes(valor)
+  );
+  
+  if (filtrados.length > 0) {
+    listaPlacas.innerHTML = "";
+    filtrados.forEach(vehiculo => {
+      const item = document.createElement("div");
+      item.className = "autocomplete-item";
+      item.innerHTML = `<strong>${vehiculo.placa}</strong> - ${vehiculo.marca}`;
+      item.addEventListener("click", () => {
+        inputPlaca.value = vehiculo.placa;
+        selectMarca.innerHTML = `<option value="${vehiculo.marca}" selected>${vehiculo.marca}</option>`;
+        selectMarca.disabled = false;
+        listaPlacas.style.display = "none";
+      });
+      listaPlacas.appendChild(item);
     });
+    listaPlacas.style.display = "block";
+  } else {
+    listaPlacas.innerHTML = '<div class="autocomplete-no-results">No se encontraron placas</div>';
+    listaPlacas.style.display = "block";
+    selectMarca.disabled = true;
+    selectMarca.innerHTML = '<option value="">Placa no encontrada</option>';
+  }
 });
 
-// Convertir placa a mayúsculas automáticamente
-document.querySelector('input[name="placa"]').addEventListener('input', function(e) {
-    e.target.value = e.target.value.toUpperCase();
+// Cerrar lista al hacer clic fuera
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".autocomplete-container")) {
+    listaPlacas.style.display = "none";
+  }
+});
+
+function convertirBase64(file){
+return new Promise((res,rej)=>{
+const r=new FileReader();
+r.onload=()=>res(r.result);
+r.onerror=e=>rej(e);
+r.readAsDataURL(file);
+});
+}
+
+function preview(id,p){
+document.getElementById(id).addEventListener("change",e=>{
+const f=e.target.files[0];
+if(f){
+const r=new FileReader();
+r.onload=x=>{
+p.innerHTML=`<img src="${x.target.result}">`;
+p.style.display="block";
+};
+r.readAsDataURL(f);
+}
+});
+}
+
+["Derecho","Izquierdo","Frente","Atras","Interior","Tablero","Licencia","Circulacion"]
+.forEach(f=>preview("foto"+f,document.getElementById("preview"+f)));
+
+function mostrarTiempoUso(datos) {
+  const divTiempo = document.getElementById("tiempoUso");
+  
+  if (!datos.tiempoUso) {
+    divTiempo.style.display = "none";
+    return;
+  }
+  
+  const horas = Math.floor(datos.tiempoUso / 60);
+  const minutos = datos.tiempoUso % 60;
+  
+  let tiempoTexto = "";
+  if (horas > 0) {
+    tiempoTexto = `${horas} hora${horas !== 1 ? 's' : ''} y ${minutos} minuto${minutos !== 1 ? 's' : ''}`;
+  } else {
+    tiempoTexto = `${minutos} minuto${minutos !== 1 ? 's' : ''}`;
+  }
+  
+  divTiempo.innerHTML = `
+    <h3>⏱️ Control de Tiempo de Uso</h3>
+    <div class="detalle"><strong>Placa:</strong> ${datos.placa}</div>
+    <div class="detalle"><strong>Última ${datos.ultimoMovimiento}:</strong> ${datos.fechaUltimoRegistro} a las ${datos.horaUltimoRegistro}</div>
+    <div class="detalle"><strong>Movimiento actual:</strong> ${datos.movimientoActual}</div>
+    <div class="destacado">⏰ TIEMPO DE USO: ${tiempoTexto}</div>
+  `;
+  divTiempo.style.display = "block";
+}
+
+document.getElementById("formDatos").addEventListener("submit",async e=>{
+e.preventDefault();
+const btn=document.getElementById("btnEnviar");
+const res=document.getElementById("respuesta");
+const divTiempo = document.getElementById("tiempoUso");
+btn.disabled=true;
+res.className="loading";
+res.innerHTML="⏳ Enviando...";
+divTiempo.style.display = "none";
+
+// Validar que todas las fotos estén cargadas
+const fotosRequeridas = ["fotoDerecho","fotoIzquierdo","fotoFrente","fotoAtras","fotoInterior","fotoTablero","fotoLicencia","fotoCirculacion"];
+for (let foto of fotosRequeridas) {
+  if (!document.getElementById(foto).files[0]) {
+    res.className="error";
+    res.innerHTML="❌ Todas las fotografías son obligatorias";
+    btn.disabled=false;
+    return;
+  }
+}
+
+try{
+const ubicacion = await new Promise((ok,fail)=>{
+navigator.geolocation.getCurrentPosition(
+p=>ok({lat:p.coords.latitude,lng:p.coords.longitude}),
+()=>fail("GPS_DENEGADO"),
+{enableHighAccuracy:true}
+);
+});
+
+const f=e.target;
+const data={
+fecha:new Date().toLocaleDateString("es-MX"),
+hora:new Date().toLocaleTimeString("es-MX"),
+movimiento:f.movimiento.value,
+nombre:f.nombre.value,
+usuario:f.usuario.value,
+tienda:f.tienda.value,
+placa:f.placa.value,
+marca_y_submarca:f.marca_y_submarca.value,
+kilometraje:f.kilometraje.value,
+comentarios:f.comentarios.value,
+latitud:ubicacion.lat,
+longitud:ubicacion.lng,
+fotoDerecho:await convertirBase64(fotoDerecho.files[0]),
+fotoIzquierdo:await convertirBase64(fotoIzquierdo.files[0]),
+fotoFrente:await convertirBase64(fotoFrente.files[0]),
+fotoAtras:await convertirBase64(fotoAtras.files[0]),
+fotoInterior:await convertirBase64(fotoInterior.files[0]),
+fotoTablero:await convertirBase64(fotoTablero.files[0]),
+fotoLicencia:await convertirBase64(fotoLicencia.files[0]),
+fotoCirculacion:await convertirBase64(fotoCirculacion.files[0])
+};
+
+const response = await fetch(webAppUrl,{method:"POST",body:JSON.stringify(data)});
+const resultado = await response.json();
+
+if (resultado.success) {
+  res.className="success";
+  res.innerHTML="✅ Registro enviado correctamente";
+  
+  if (resultado.tiempoUso !== undefined) {
+    mostrarTiempoUso({
+      placa: data.placa,
+      tiempoUso: resultado.tiempoUso,
+      ultimoMovimiento: resultado.ultimoMovimiento,
+      fechaUltimoRegistro: resultado.fechaUltimoRegistro,
+      horaUltimoRegistro: resultado.horaUltimoRegistro,
+      movimientoActual: data.movimiento
+    });
+  }
+  
+  f.reset();
+  selectMarca.disabled = true;
+  selectMarca.innerHTML = '<option value="">Primero selecciona una placa</option>';
+  document.querySelectorAll(".file-preview").forEach(p=>p.style.display="none");
+} else {
+  throw new Error(resultado.error || "Error al enviar");
+}
+
+}catch(err){
+if (err === "GPS_DENEGADO") {
+  document.getElementById("gpsWarning").classList.add("show");
+  res.className="error";
+  res.innerHTML="❌ Debes permitir la ubicación para enviar";
+} else {
+  res.className="error";
+  res.innerHTML="❌ Error: " + err.message;
+}
+}
+btn.disabled=false;
 });
 </script>
 

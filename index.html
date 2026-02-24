@@ -30,12 +30,32 @@ button:disabled{background:#ccc}
 .autocomplete-item{padding:12px;cursor:pointer;border-bottom:1px solid #e0e0e0}
 .autocomplete-item:hover{background:#e8f5e9}
 .autocomplete-item:last-child{border-bottom:none}
-.autocomplete-no-results{padding:12px;color:#666;font-style:italic;text-align:center}
+/* Aviso de placa no encontrada */
+.placa-no-encontrada{
+  display:none;
+  margin-top:8px;
+  padding:10px 14px;
+  background:#fdecea;
+  border:2px solid #e53935;
+  border-radius:6px;
+  color:#b71c1c;
+  font-weight:bold;
+  font-size:14px;
+}
+.placa-no-encontrada.show{display:flex;align-items:center;gap:8px}
+/* Contador de caracteres de placa */
+.placa-counter{font-size:12px;color:#888;text-align:right;margin-top:4px}
+.placa-counter.lleno{color:#e53935;font-weight:bold}
 .tiempo-uso{background:#fff9c4;border:2px solid #fbc02d;padding:20px;border-radius:8px;margin-top:20px;display:none}
 .tiempo-uso h3{color:#f57f17;margin-bottom:10px;font-size:20px}
 .tiempo-uso .detalle{font-size:16px;margin:8px 0;color:#333}
 .tiempo-uso .detalle strong{color:#f57f17}
 .tiempo-uso .destacado{font-size:24px;font-weight:bold;color:#e65100;margin-top:15px;padding:10px;background:#fff;border-radius:6px;text-align:center}
+.debug-info{background:#e3f2fd;border:2px solid #2196f3;padding:15px;margin-top:15px;border-radius:8px;font-size:13px;font-family:monospace;max-height:300px;overflow-y:auto}
+.debug-info div{padding:5px 0;border-bottom:1px solid #90caf9}
+.debug-info div:last-child{border-bottom:none}
+.debug-info .error{color:#c62828}
+.debug-info .success{color:#2e7d32}
 </style>
 </head>
 
@@ -66,16 +86,30 @@ button:disabled{background:#ccc}
 <label>Nombre <span class="required">*</span></label>
 <input name="nombre" required>
 
-<label>Usuario Beta <span class="required">*</span></label>
-<input name="usuario" required>
+<label>Usuario BETA <span class="required">*</span></label>
+<input name="usuario BETA" required>
 
 <label>Tienda <span class="required">*</span></label>
 <input name="tienda" required>
 
 <label>Placa <span class="required">*</span></label>
 <div class="autocomplete-container">
-<input name="placa" id="inputPlaca" required style="text-transform:uppercase" autocomplete="off" placeholder="Escribe la placa...">
-<div class="autocomplete-list" id="listaPlacas"></div>
+  <input
+    name="placa"
+    id="inputPlaca"
+    required
+    style="text-transform:uppercase"
+    autocomplete="off"
+    placeholder="Máx. 8 caracteres alfanuméricos"
+    maxlength="8"
+    pattern="[A-Za-z0-9]{1,8}"
+    title="Solo letras y números, máximo 8 caracteres"
+  >
+  <div class="placa-counter" id="placaCounter">0 / 8 caracteres</div>
+  <div class="autocomplete-list" id="listaPlacas"></div>
+  <div class="placa-no-encontrada" id="placaNoEncontrada">
+    ⚠️ Placa no encontrada en el sistema
+  </div>
 </div>
 
 <label>Marca y Submarca <span class="required">*</span></label>
@@ -101,19 +135,19 @@ button:disabled{background:#ccc}
 <input type="file" id="fotoIzquierdo" accept="image/*" capture required>
 <div class="file-preview" id="previewIzquierdo"></div>
 
-<label>3️⃣ Frente <span class="required">*</span></label>
+<label>3️⃣ Frente Unidad <span class="required">*</span></label>
 <input type="file" id="fotoFrente" accept="image/*" capture required>
 <div class="file-preview" id="previewFrente"></div>
 
-<label>4️⃣ Atrás <span class="required">*</span></label>
+<label>4️⃣ Atrás Unidad <span class="required">*</span></label>
 <input type="file" id="fotoAtras" accept="image/*" capture required>
 <div class="file-preview" id="previewAtras"></div>
 
-<label>5️⃣ Interior <span class="required">*</span></label>
+<label>5️⃣ Interior (Caja)<span class="required">*</span></label>
 <input type="file" id="fotoInterior" accept="image/*" capture required>
 <div class="file-preview" id="previewInterior"></div>
 
-<label>6️⃣ Tablero <span class="required">*</span></label>
+<label>6️⃣ Kilometraje Tablero <span class="required">*</span></label>
 <input type="file" id="fotoTablero" accept="image/*" capture required>
 <div class="file-preview" id="previewTablero"></div>
 
@@ -131,6 +165,9 @@ button:disabled{background:#ccc}
 </form>
 
 <div id="respuesta"></div>
+<div class="debug-info" id="debugInfo" style="display:none">
+  <strong>📊 Información de Debug:</strong>
+</div>
 <div class="tiempo-uso" id="tiempoUso"></div>
 </div>
 
@@ -138,18 +175,30 @@ button:disabled{background:#ccc}
 const webAppUrl = "https://script.google.com/macros/s/AKfycbwpz-KfDJNPjT_u2LBT6eP4gClQ2WsbEfa160fTLlHWcqivDyTM3eUnmMzEE9CdItmJ/exec";
 let vehiculosData = [];
 
+function addDebug(mensaje, tipo = 'info') {
+  const debugDiv = document.getElementById("debugInfo");
+  debugDiv.style.display = "block";
+  const time = new Date().toLocaleTimeString('es-MX');
+  const clase = tipo === 'error' ? 'error' : tipo === 'success' ? 'success' : '';
+  debugDiv.innerHTML += `<div class="${clase}">[${time}] ${mensaje}</div>`;
+  console.log(mensaje);
+}
+
 // Cargar vehículos y verificar permisos al iniciar
 window.addEventListener("load", async () => {
-  // Solicitar permiso de ubicación
+  addDebug("🚀 Iniciando aplicación...");
+  
   try {
     await new Promise((resolve, reject) => {
       navigator.geolocation.getCurrentPosition(
         () => {
           document.getElementById("gpsWarning").classList.remove("show");
+          addDebug("✅ GPS habilitado correctamente", 'success');
           resolve();
         },
         () => {
           document.getElementById("gpsWarning").classList.add("show");
+          addDebug("❌ GPS denegado por el usuario", 'error');
           reject();
         },
         {enableHighAccuracy: true}
@@ -159,36 +208,61 @@ window.addEventListener("load", async () => {
     console.log("Permiso de ubicación denegado");
   }
   
-  // Cargar vehículos
   try {
+    addDebug("📡 Cargando vehículos desde servidor...");
     const response = await fetch(webAppUrl + "?action=getVehiculos");
     vehiculosData = await response.json();
-    console.log("Vehículos cargados:", vehiculosData.length);
+    addDebug(`✅ ${vehiculosData.length} vehículos cargados correctamente`, 'success');
+    console.log("Vehículos:", vehiculosData);
   } catch (error) {
+    addDebug(`❌ Error cargando vehículos: ${error.message}`, 'error');
     console.error("Error cargando vehículos:", error);
   }
 });
 
-// Autocompletado de placas
+// Referencias del campo placa
 const inputPlaca = document.getElementById("inputPlaca");
 const listaPlacas = document.getElementById("listaPlacas");
 const selectMarca = document.getElementById("selectMarca");
+const placaCounter = document.getElementById("placaCounter");
+const placaNoEncontrada = document.getElementById("placaNoEncontrada");
 
-inputPlaca.addEventListener("input", (e) => {
-  const valor = e.target.value.toUpperCase();
-  inputPlaca.value = valor;
-  
-  if (valor.length === 0) {
-    listaPlacas.style.display = "none";
-    selectMarca.disabled = true;
-    selectMarca.innerHTML = '<option value="">Primero selecciona una placa</option>';
-    return;
+// ───────────────────────────────────────────────
+// Validación: solo caracteres alfanuméricos y máx 8
+// ───────────────────────────────────────────────
+inputPlaca.addEventListener("keypress", (e) => {
+  const char = String.fromCharCode(e.which || e.keyCode);
+  if (!/[A-Za-z0-9]/.test(char)) {
+    e.preventDefault(); // bloquea cualquier carácter no alfanumérico
   }
-  
-  const filtrados = vehiculosData.filter(v => 
+});
+
+// También limpiar si el usuario pega texto
+inputPlaca.addEventListener("input", (e) => {
+  // Eliminar caracteres no alfanuméricos que puedan llegar por paste
+  let valor = e.target.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+  // Respetar máximo de 8
+  if (valor.length > 8) valor = valor.slice(0, 8);
+  inputPlaca.value = valor;
+
+  // Actualizar contador
+  const len = valor.length;
+  placaCounter.textContent = `${len} / 8 caracteres`;
+  placaCounter.classList.toggle("lleno", len === 8);
+
+  // Resetear estado
+  placaNoEncontrada.classList.remove("show");
+  listaPlacas.style.display = "none";
+  selectMarca.disabled = true;
+  selectMarca.innerHTML = '<option value="">Primero selecciona una placa</option>';
+
+  if (valor.length === 0) return;
+
+  // Buscar coincidencias
+  const filtrados = vehiculosData.filter(v =>
     v.placa.toUpperCase().includes(valor)
   );
-  
+
   if (filtrados.length > 0) {
     listaPlacas.innerHTML = "";
     filtrados.forEach(vehiculo => {
@@ -197,16 +271,20 @@ inputPlaca.addEventListener("input", (e) => {
       item.innerHTML = `<strong>${vehiculo.placa}</strong> - ${vehiculo.marca}`;
       item.addEventListener("click", () => {
         inputPlaca.value = vehiculo.placa;
+        placaCounter.textContent = `${vehiculo.placa.length} / 8 caracteres`;
+        placaCounter.classList.toggle("lleno", vehiculo.placa.length === 8);
         selectMarca.innerHTML = `<option value="${vehiculo.marca}" selected>${vehiculo.marca}</option>`;
         selectMarca.disabled = false;
         listaPlacas.style.display = "none";
+        placaNoEncontrada.classList.remove("show");
       });
       listaPlacas.appendChild(item);
     });
     listaPlacas.style.display = "block";
   } else {
-    listaPlacas.innerHTML = '<div class="autocomplete-no-results">No se encontraron placas</div>';
-    listaPlacas.style.display = "block";
+    // ── AVISO PLACA NO ENCONTRADA ──
+    listaPlacas.style.display = "none";
+    placaNoEncontrada.classList.add("show");
     selectMarca.disabled = true;
     selectMarca.innerHTML = '<option value="">Placa no encontrada</option>';
   }
@@ -220,26 +298,26 @@ document.addEventListener("click", (e) => {
 });
 
 function convertirBase64(file){
-return new Promise((res,rej)=>{
-const r=new FileReader();
-r.onload=()=>res(r.result);
-r.onerror=e=>rej(e);
-r.readAsDataURL(file);
-});
+  return new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onload=()=>res(r.result);
+    r.onerror=e=>rej(e);
+    r.readAsDataURL(file);
+  });
 }
 
 function preview(id,p){
-document.getElementById(id).addEventListener("change",e=>{
-const f=e.target.files[0];
-if(f){
-const r=new FileReader();
-r.onload=x=>{
-p.innerHTML=`<img src="${x.target.result}">`;
-p.style.display="block";
-};
-r.readAsDataURL(f);
-}
-});
+  document.getElementById(id).addEventListener("change",e=>{
+    const f=e.target.files[0];
+    if(f){
+      const r=new FileReader();
+      r.onload=x=>{
+        p.innerHTML=`<img src="${x.target.result}">`;
+        p.style.display="block";
+      };
+      r.readAsDataURL(f);
+    }
+  });
 }
 
 ["Derecho","Izquierdo","Frente","Atras","Interior","Tablero","Licencia","Circulacion"]
@@ -274,99 +352,134 @@ function mostrarTiempoUso(datos) {
 }
 
 document.getElementById("formDatos").addEventListener("submit",async e=>{
-e.preventDefault();
-const btn=document.getElementById("btnEnviar");
-const res=document.getElementById("respuesta");
-const divTiempo = document.getElementById("tiempoUso");
-btn.disabled=true;
-res.className="loading";
-res.innerHTML="⏳ Enviando...";
-divTiempo.style.display = "none";
+  e.preventDefault();
+  const btn=document.getElementById("btnEnviar");
+  const res=document.getElementById("respuesta");
+  const divTiempo = document.getElementById("tiempoUso");
+  btn.disabled=true;
+  res.className="loading";
+  res.innerHTML="⏳ Enviando...";
+  divTiempo.style.display = "none";
+  
+  addDebug("📤 Iniciando envío de formulario...");
 
-// Validar que todas las fotos estén cargadas
-const fotosRequeridas = ["fotoDerecho","fotoIzquierdo","fotoFrente","fotoAtras","fotoInterior","fotoTablero","fotoLicencia","fotoCirculacion"];
-for (let foto of fotosRequeridas) {
-  if (!document.getElementById(foto).files[0]) {
+  // Validar que la placa tenga al menos 1 carácter alfanumérico válido
+  const placaVal = inputPlaca.value.trim();
+  if (!/^[A-Z0-9]{1,8}$/.test(placaVal)) {
     res.className="error";
-    res.innerHTML="❌ Todas las fotografías son obligatorias";
+    res.innerHTML="❌ La placa debe contener solo letras y números (máx. 8 caracteres)";
+    addDebug("❌ Placa inválida", 'error');
     btn.disabled=false;
     return;
   }
-}
 
-try{
-const ubicacion = await new Promise((ok,fail)=>{
-navigator.geolocation.getCurrentPosition(
-p=>ok({lat:p.coords.latitude,lng:p.coords.longitude}),
-()=>fail("GPS_DENEGADO"),
-{enableHighAccuracy:true}
-);
-});
-
-const f=e.target;
-const data={
-fecha:new Date().toLocaleDateString("es-MX"),
-hora:new Date().toLocaleTimeString("es-MX"),
-movimiento:f.movimiento.value,
-nombre:f.nombre.value,
-usuario:f.usuario.value,
-tienda:f.tienda.value,
-placa:f.placa.value,
-marca_y_submarca:f.marca_y_submarca.value,
-kilometraje:f.kilometraje.value,
-comentarios:f.comentarios.value,
-latitud:ubicacion.lat,
-longitud:ubicacion.lng,
-fotoDerecho:await convertirBase64(fotoDerecho.files[0]),
-fotoIzquierdo:await convertirBase64(fotoIzquierdo.files[0]),
-fotoFrente:await convertirBase64(fotoFrente.files[0]),
-fotoAtras:await convertirBase64(fotoAtras.files[0]),
-fotoInterior:await convertirBase64(fotoInterior.files[0]),
-fotoTablero:await convertirBase64(fotoTablero.files[0]),
-fotoLicencia:await convertirBase64(fotoLicencia.files[0]),
-fotoCirculacion:await convertirBase64(fotoCirculacion.files[0])
-};
-
-const response = await fetch(webAppUrl,{method:"POST",body:JSON.stringify(data)});
-const resultado = await response.json();
-
-if (resultado.success) {
-  res.className="success";
-  res.innerHTML="✅ Registro enviado correctamente";
-  
-  if (resultado.tiempoUso !== undefined) {
-    mostrarTiempoUso({
-      placa: data.placa,
-      tiempoUso: resultado.tiempoUso,
-      ultimoMovimiento: resultado.ultimoMovimiento,
-      fechaUltimoRegistro: resultado.fechaUltimoRegistro,
-      horaUltimoRegistro: resultado.horaUltimoRegistro,
-      movimientoActual: data.movimiento
-    });
+  const fotosRequeridas = ["fotoDerecho","fotoIzquierdo","fotoFrente","fotoAtras","fotoInterior","fotoTablero","fotoLicencia","fotoCirculacion"];
+  for (let foto of fotosRequeridas) {
+    if (!document.getElementById(foto).files[0]) {
+      res.className="error";
+      res.innerHTML="❌ Todas las fotografías son obligatorias";
+      addDebug(`❌ Falta la foto: ${foto}`, 'error');
+      btn.disabled=false;
+      return;
+    }
   }
   
-  f.reset();
-  selectMarca.disabled = true;
-  selectMarca.innerHTML = '<option value="">Primero selecciona una placa</option>';
-  document.querySelectorAll(".file-preview").forEach(p=>p.style.display="none");
-} else {
-  throw new Error(resultado.error || "Error al enviar");
-}
+  addDebug("✅ Todas las fotos validadas (8/8)", 'success');
 
-}catch(err){
-if (err === "GPS_DENEGADO") {
-  document.getElementById("gpsWarning").classList.add("show");
-  res.className="error";
-  res.innerHTML="❌ Debes permitir la ubicación para enviar";
-} else {
-  res.className="error";
-  res.innerHTML="❌ Error: " + err.message;
-}
-}
-btn.disabled=false;
+  try{
+    addDebug("📍 Obteniendo ubicación GPS...");
+    const ubicacion = await new Promise((ok,fail)=>{
+      navigator.geolocation.getCurrentPosition(
+        p=>{
+          addDebug(`✅ GPS obtenido: ${p.coords.latitude.toFixed(6)}, ${p.coords.longitude.toFixed(6)}`, 'success');
+          ok({lat:p.coords.latitude,lng:p.coords.longitude});
+        },
+        ()=>fail("GPS_DENEGADO"),
+        {enableHighAccuracy:true}
+      );
+    });
+
+    const f=e.target;
+    
+    addDebug("🖼️ Convirtiendo fotos a base64...");
+    
+    const data={
+      fecha:new Date().toLocaleDateString("es-MX"),
+      hora:new Date().toLocaleTimeString("es-MX"),
+      movimiento:f.movimiento.value,
+      nombre:f.nombre.value,
+      usuario:f.usuario.value,
+      tienda:f.tienda.value,
+      placa:f.placa.value,
+      marca_y_submarca:f.marca_y_submarca.value,
+      kilometraje:f.kilometraje.value,
+      comentarios:f.comentarios.value,
+      latitud:ubicacion.lat,
+      longitud:ubicacion.lng,
+      fotoDerecho: await convertirBase64(document.getElementById("fotoDerecho").files[0]),
+      fotoIzquierdo: await convertirBase64(document.getElementById("fotoIzquierdo").files[0]),
+      fotoFrente: await convertirBase64(document.getElementById("fotoFrente").files[0]),
+      fotoAtras: await convertirBase64(document.getElementById("fotoAtras").files[0]),
+      fotoInterior: await convertirBase64(document.getElementById("fotoInterior").files[0]),
+      fotoTablero: await convertirBase64(document.getElementById("fotoTablero").files[0]),
+      fotoLicencia: await convertirBase64(document.getElementById("fotoLicencia").files[0]),
+      fotoCirculacion: await convertirBase64(document.getElementById("fotoCirculacion").files[0])
+    };
+    
+    addDebug("✅ Fotos convertidas correctamente", 'success');
+    addDebug(`📨 Enviando datos: ${data.placa} - ${data.movimiento}`);
+
+    const response = await fetch(webAppUrl,{
+      method:"POST",
+      body:JSON.stringify(data)
+    });
+    
+    addDebug("📥 Respuesta recibida del servidor");
+    const resultado = await response.json();
+    addDebug(`Resultado: ${JSON.stringify(resultado)}`);
+
+    if (resultado.success) {
+      res.className="success";
+      res.innerHTML="✅ Registro enviado correctamente";
+      addDebug("🎉 ¡Registro guardado exitosamente en Google Sheets!", 'success');
+      
+      if (resultado.tiempoUso !== undefined) {
+        mostrarTiempoUso({
+          placa: data.placa,
+          tiempoUso: resultado.tiempoUso,
+          ultimoMovimiento: resultado.ultimoMovimiento,
+          fechaUltimoRegistro: resultado.fechaUltimoRegistro,
+          horaUltimoRegistro: resultado.horaUltimoRegistro,
+          movimientoActual: data.movimiento
+        });
+      }
+      
+      f.reset();
+      inputPlaca.value = "";
+      placaCounter.textContent = "0 / 8 caracteres";
+      placaCounter.classList.remove("lleno");
+      placaNoEncontrada.classList.remove("show");
+      selectMarca.disabled = true;
+      selectMarca.innerHTML = '<option value="">Primero selecciona una placa</option>';
+      document.querySelectorAll(".file-preview").forEach(p=>p.style.display="none");
+    } else {
+      throw new Error(resultado.error || "Error al enviar");
+    }
+
+  }catch(err){
+    addDebug(`❌ ERROR: ${err.message || err}`, 'error');
+    if (err === "GPS_DENEGADO") {
+      document.getElementById("gpsWarning").classList.add("show");
+      res.className="error";
+      res.innerHTML="❌ Debes permitir la ubicación para enviar";
+    } else {
+      res.className="error";
+      res.innerHTML="❌ Error: " + (err.message || err);
+    }
+  }
+  btn.disabled=false;
 });
 </script>
 
 </body>
 </html>
-

@@ -86,8 +86,8 @@ button:disabled{background:#ccc}
 <label>Nombre <span class="required">*</span></label>
 <input name="nombre" required>
 
-<label>Usuario BETA <span class="required">*</span></label>
-<input name="usuario BETA" required>
+<label>Usuario <span class="required">*</span></label>
+<input name="usuario" required>
 
 <label>Tienda <span class="required">*</span></label>
 <input name="tienda" required>
@@ -399,21 +399,35 @@ document.getElementById("formDatos").addEventListener("submit",async e=>{
       );
     });
 
-    const f=e.target;
-    
     addDebug("🖼️ Convirtiendo fotos a base64...");
-    
+
+    // Leer campos individualmente con log de debug para detectar cuál falla
+    const getVal = (name) => {
+      const el = document.querySelector('[name="' + name + '"]');
+      if (!el) { throw new Error("Campo '" + name + "' no encontrado en el DOM"); }
+      const val = el.value;
+      addDebug("📋 Campo '" + name + "' = \"" + val + "\"");
+      return val;
+    };
+
+    // Marca: leer directamente por ID (evita problemas con disabled)
+    const marcaEl = document.getElementById("selectMarca");
+    const marcaVal = marcaEl && marcaEl.selectedIndex >= 0
+      ? (marcaEl.options[marcaEl.selectedIndex] ? marcaEl.options[marcaEl.selectedIndex].value : "")
+      : "";
+    addDebug("📋 Campo 'marca_y_submarca' = \"" + marcaVal + "\"");
+
     const data={
       fecha:new Date().toLocaleDateString("es-MX"),
       hora:new Date().toLocaleTimeString("es-MX"),
-      movimiento:f.movimiento.value,
-      nombre:f.nombre.value,
-      usuario:f.usuario.value,
-      tienda:f.tienda.value,
-      placa:f.placa.value,
-      marca_y_submarca:f.marca_y_submarca.value,
-      kilometraje:f.kilometraje.value,
-      comentarios:f.comentarios.value,
+      movimiento:getVal("movimiento"),
+      nombre:getVal("nombre"),
+      usuario:getVal("usuario"),
+      tienda:getVal("tienda"),
+      placa:inputPlaca.value,
+      marca_y_submarca:marcaVal,
+      kilometraje:getVal("kilometraje"),
+      comentarios:getVal("comentarios"),
       latitud:ubicacion.lat,
       longitud:ubicacion.lng,
       fotoDerecho: await convertirBase64(document.getElementById("fotoDerecho").files[0]),
@@ -454,7 +468,7 @@ document.getElementById("formDatos").addEventListener("submit",async e=>{
         });
       }
       
-      f.reset();
+      document.getElementById("formDatos").reset();
       inputPlaca.value = "";
       placaCounter.textContent = "0 / 8 caracteres";
       placaCounter.classList.remove("lleno");

@@ -17,33 +17,20 @@ input[type=file]{border:2px dashed #00a64f;background:#f9f9f9}
 .file-preview{display:none;margin-top:10px}
 .file-preview img{max-width:150px;border-radius:8px;border:2px solid #00a64f}
 button{margin-top:25px;width:100%;padding:15px;background:#00a64f;border:none;color:#fff;font-size:18px;border-radius:8px;cursor:pointer}
-button:disabled{background:#ccc}
+button:disabled{background:#aaa;cursor:not-allowed}
 .required{color:#d32f2f}
 .permissions-warning{display:none;background:#fff3cd;border:1px solid #ffc107;color:#856404;padding:15px;border-radius:8px;margin-bottom:15px}
 .permissions-warning.show{display:block}
 #respuesta{margin-top:20px;padding:15px;border-radius:8px;font-weight:bold;text-align:center;display:none}
 #respuesta.success{background:#d4edda;color:#155724;display:block}
 #respuesta.error{background:#f8d7da;color:#721c24;display:block}
-#respuesta.loading{background:#d1ecf1;color:#0c5460;display:block}
 .autocomplete-container{position:relative}
 .autocomplete-list{position:absolute;top:100%;left:0;right:0;max-height:200px;overflow-y:auto;background:#fff;border:2px solid #00a64f;border-top:none;border-radius:0 0 6px 6px;z-index:100;display:none}
 .autocomplete-item{padding:12px;cursor:pointer;border-bottom:1px solid #e0e0e0}
 .autocomplete-item:hover{background:#e8f5e9}
 .autocomplete-item:last-child{border-bottom:none}
-/* Aviso de placa no encontrada */
-.placa-no-encontrada{
-  display:none;
-  margin-top:8px;
-  padding:10px 14px;
-  background:#fdecea;
-  border:2px solid #e53935;
-  border-radius:6px;
-  color:#b71c1c;
-  font-weight:bold;
-  font-size:14px;
-}
+.placa-no-encontrada{display:none;margin-top:8px;padding:10px 14px;background:#fdecea;border:2px solid #e53935;border-radius:6px;color:#b71c1c;font-weight:bold;font-size:14px}
 .placa-no-encontrada.show{display:flex;align-items:center;gap:8px}
-/* Contador de caracteres de placa */
 .placa-counter{font-size:12px;color:#888;text-align:right;margin-top:4px}
 .placa-counter.lleno{color:#e53935;font-weight:bold}
 .tiempo-uso{background:#fff9c4;border:2px solid #fbc02d;padding:20px;border-radius:8px;margin-top:20px;display:none}
@@ -51,11 +38,60 @@ button:disabled{background:#ccc}
 .tiempo-uso .detalle{font-size:16px;margin:8px 0;color:#333}
 .tiempo-uso .detalle strong{color:#f57f17}
 .tiempo-uso .destacado{font-size:24px;font-weight:bold;color:#e65100;margin-top:15px;padding:10px;background:#fff;border-radius:6px;text-align:center}
-.debug-info{background:#e3f2fd;border:2px solid #2196f3;padding:15px;margin-top:15px;border-radius:8px;font-size:13px;font-family:monospace;max-height:300px;overflow-y:auto}
-.debug-info div{padding:5px 0;border-bottom:1px solid #90caf9}
-.debug-info div:last-child{border-bottom:none}
-.debug-info .error{color:#c62828}
-.debug-info .success{color:#2e7d32}
+
+/* ── BARRA DE PROGRESO ── */
+#progressWrap{
+  display:none;
+  margin-top:20px;
+  background:#e8f5e9;
+  border:1px solid #00a64f;
+  border-radius:10px;
+  padding:16px 20px;
+}
+#progressWrap.show{display:block}
+#progressLabel{
+  font-size:14px;
+  font-weight:bold;
+  color:#006b37;
+  margin-bottom:8px;
+  text-align:center;
+}
+#progressBar{
+  width:100%;
+  height:22px;
+  background:#c8e6c9;
+  border-radius:20px;
+  overflow:hidden;
+}
+#progressFill{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,#00a64f,#00c060);
+  border-radius:20px;
+  transition:width 0.4s ease;
+  position:relative;
+  overflow:hidden;
+}
+#progressFill::after{
+  content:'';
+  position:absolute;
+  top:0;left:-60%;
+  width:50%;height:100%;
+  background:rgba(255,255,255,0.35);
+  transform:skewX(-20deg);
+  animation:shimmer 1.2s infinite;
+}
+@keyframes shimmer{
+  0%{left:-60%}
+  100%{left:120%}
+}
+#progressPct{
+  text-align:center;
+  font-size:13px;
+  color:#00695c;
+  font-weight:bold;
+  margin-top:6px;
+}
 </style>
 </head>
 
@@ -66,9 +102,9 @@ button:disabled{background:#ccc}
 <div class="container">
 
 <div class="permissions-warning" id="gpsWarning">
-<strong>📍 Ubicación requerida</strong>
-<p>Debes permitir la ubicación para enviar el registro.</p>
-<p><b>Sin GPS no se puede continuar.</b></p>
+  <strong>📍 Ubicación requerida</strong>
+  <p>Debes permitir la ubicación para enviar el registro.</p>
+  <p><b>Sin GPS no se puede continuar.</b></p>
 </div>
 
 <form id="formDatos">
@@ -78,9 +114,9 @@ button:disabled{background:#ccc}
 
 <label>Movimiento <span class="required">*</span></label>
 <select name="movimiento" required>
-<option value="">Selecciona</option>
-<option>ENTRADA</option>
-<option>SALIDA</option>
+  <option value="">Selecciona</option>
+  <option>ENTRADA</option>
+  <option>SALIDA</option>
 </select>
 
 <label>Nombre <span class="required">*</span></label>
@@ -100,21 +136,21 @@ button:disabled{background:#ccc}
     required
     style="text-transform:uppercase"
     autocomplete="off"
-    placeholder="Máx. 8 caracteres alfanuméricos"
+    placeholder="Max. 8 caracteres alfanumericos"
     maxlength="8"
     pattern="[A-Za-z0-9]{1,8}"
-    title="Solo letras y números, máximo 8 caracteres"
+    title="Solo letras y numeros, maximo 8 caracteres"
   >
   <div class="placa-counter" id="placaCounter">0 / 8 caracteres</div>
   <div class="autocomplete-list" id="listaPlacas"></div>
   <div class="placa-no-encontrada" id="placaNoEncontrada">
-    ⚠️ Placa no encontrada en el sistema
+    Placa no encontrada en el sistema
   </div>
 </div>
 
 <label>Marca y Submarca <span class="required">*</span></label>
 <select name="marca_y_submarca" id="selectMarca" required disabled>
-<option value="">Primero selecciona una placa</option>
+  <option value="">Primero selecciona una placa</option>
 </select>
 
 <label>Kilometraje <span class="required">*</span></label>
@@ -125,155 +161,167 @@ button:disabled{background:#ccc}
 </div>
 
 <div class="form-section">
-<h3>📸 Fotografías obligatorias</h3>
+<h3>📸 Fotografias obligatorias</h3>
 
-<label>1️⃣ Lado Derecho <span class="required">*</span></label>
+<label>1 Lado Derecho <span class="required">*</span></label>
 <input type="file" id="fotoDerecho" accept="image/*" capture required>
 <div class="file-preview" id="previewDerecho"></div>
 
-<label>2️⃣ Lado Izquierdo <span class="required">*</span></label>
+<label>2 Lado Izquierdo <span class="required">*</span></label>
 <input type="file" id="fotoIzquierdo" accept="image/*" capture required>
 <div class="file-preview" id="previewIzquierdo"></div>
 
-<label>3️⃣ Frente Unidad <span class="required">*</span></label>
+<label>3 Frente Unidad <span class="required">*</span></label>
 <input type="file" id="fotoFrente" accept="image/*" capture required>
 <div class="file-preview" id="previewFrente"></div>
 
-<label>4️⃣ Atrás Unidad <span class="required">*</span></label>
+<label>4 Atras Unidad <span class="required">*</span></label>
 <input type="file" id="fotoAtras" accept="image/*" capture required>
 <div class="file-preview" id="previewAtras"></div>
 
-<label>5️⃣ Interior (Caja)<span class="required">*</span></label>
+<label>5 Interior (Caja) <span class="required">*</span></label>
 <input type="file" id="fotoInterior" accept="image/*" capture required>
 <div class="file-preview" id="previewInterior"></div>
 
-<label>6️⃣ Kilometraje Tablero <span class="required">*</span></label>
+<label>6 Kilometraje Tablero <span class="required">*</span></label>
 <input type="file" id="fotoTablero" accept="image/*" capture required>
 <div class="file-preview" id="previewTablero"></div>
 
-<label>7️⃣ Licencia <span class="required">*</span></label>
+<label>7 Licencia <span class="required">*</span></label>
 <input type="file" id="fotoLicencia" accept="image/*" capture required>
 <div class="file-preview" id="previewLicencia"></div>
 
-<label>8️⃣ Tarjeta de Circulación <span class="required">*</span></label>
+<label>8 Tarjeta de Circulacion <span class="required">*</span></label>
 <input type="file" id="fotoCirculacion" accept="image/*" capture required>
 <div class="file-preview" id="previewCirculacion"></div>
 
 </div>
 
-<button id="btnEnviar">📤 Enviar Registro</button>
+<button id="btnEnviar">Enviar Registro</button>
 </form>
 
-<div id="respuesta"></div>
-<div class="debug-info" id="debugInfo" style="display:none">
-  <strong>📊 Información de Debug:</strong>
+<!-- Barra de progreso -->
+<div id="progressWrap">
+  <div id="progressLabel">Preparando envio...</div>
+  <div id="progressBar"><div id="progressFill"></div></div>
+  <div id="progressPct">0%</div>
 </div>
+
+<div id="respuesta"></div>
 <div class="tiempo-uso" id="tiempoUso"></div>
 </div>
 
 <script>
-const webAppUrl = "https://script.google.com/macros/s/AKfycbwpz-KfDJNPjT_u2LBT6eP4gClQ2WsbEfa160fTLlHWcqivDyTM3eUnmMzEE9CdItmJ/exec";
+const webAppUrl = "https://script.google.com/macros/s/AKfycbz9fRKYgIxDe6o9gTJyolc32RAZs-3I-J-FJk3z8SMDHt2l7RcUssdQnlzVa5bUPgAR/exec";
 let vehiculosData = [];
 
-function addDebug(mensaje, tipo = 'info') {
-  const debugDiv = document.getElementById("debugInfo");
-  debugDiv.style.display = "block";
-  const time = new Date().toLocaleTimeString('es-MX');
-  const clase = tipo === 'error' ? 'error' : tipo === 'success' ? 'success' : '';
-  debugDiv.innerHTML += `<div class="${clase}">[${time}] ${mensaje}</div>`;
-  console.log(mensaje);
+// ── PROGRESO ──
+function setProgress(pct, label) {
+  document.getElementById("progressFill").style.width = pct + "%";
+  document.getElementById("progressPct").textContent = pct + "%";
+  if (label) document.getElementById("progressLabel").textContent = label;
+}
+function showProgress(show) {
+  document.getElementById("progressWrap").classList.toggle("show", show);
+  if (!show) { setProgress(0, "Preparando envio..."); }
 }
 
-// Cargar vehículos y verificar permisos al iniciar
+// ── COMPRESION DE IMAGEN CON CANVAS ──
+// Redimensiona a max 800px lado mayor + calidad JPEG 0.4 -> reduce ~85-90% el peso
+function comprimirImagen(file, maxSize = 800, quality = 0.4) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onerror = reject;
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        let w = img.width, h = img.height;
+        if (w > h && w > maxSize) { h = Math.round(h * maxSize / w); w = maxSize; }
+        else if (h > maxSize)     { w = Math.round(w * maxSize / h); h = maxSize; }
+        canvas.width  = w;
+        canvas.height = h;
+        canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// ── PREVIEW DE FOTOS ──
+function preview(id, p) {
+  document.getElementById(id).addEventListener("change", e => {
+    const f = e.target.files[0];
+    if (f) {
+      const r = new FileReader();
+      r.onload = x => { p.innerHTML = `<img src="${x.target.result}">`; p.style.display = "block"; };
+      r.readAsDataURL(f);
+    }
+  });
+}
+["Derecho","Izquierdo","Frente","Atras","Interior","Tablero","Licencia","Circulacion"]
+  .forEach(f => preview("foto" + f, document.getElementById("preview" + f)));
+
+// ── CARGA INICIAL ──
 window.addEventListener("load", async () => {
-  addDebug("🚀 Iniciando aplicación...");
-  
   try {
     await new Promise((resolve, reject) => {
       navigator.geolocation.getCurrentPosition(
-        () => {
-          document.getElementById("gpsWarning").classList.remove("show");
-          addDebug("✅ GPS habilitado correctamente", 'success');
-          resolve();
-        },
-        () => {
-          document.getElementById("gpsWarning").classList.add("show");
-          addDebug("❌ GPS denegado por el usuario", 'error');
-          reject();
-        },
-        {enableHighAccuracy: true}
+        () => { document.getElementById("gpsWarning").classList.remove("show"); resolve(); },
+        () => { document.getElementById("gpsWarning").classList.add("show"); reject(); },
+        { enableHighAccuracy: true }
       );
     });
-  } catch (error) {
-    console.log("Permiso de ubicación denegado");
-  }
-  
+  } catch (e) { /* GPS denegado, se avisara al enviar */ }
+
   try {
-    addDebug("📡 Cargando vehículos desde servidor...");
     const response = await fetch(webAppUrl + "?action=getVehiculos");
     vehiculosData = await response.json();
-    addDebug(`✅ ${vehiculosData.length} vehículos cargados correctamente`, 'success');
-    console.log("Vehículos:", vehiculosData);
-  } catch (error) {
-    addDebug(`❌ Error cargando vehículos: ${error.message}`, 'error');
-    console.error("Error cargando vehículos:", error);
-  }
+  } catch (e) { console.error("Error cargando vehiculos:", e); }
 });
 
-// Referencias del campo placa
-const inputPlaca = document.getElementById("inputPlaca");
-const listaPlacas = document.getElementById("listaPlacas");
-const selectMarca = document.getElementById("selectMarca");
-const placaCounter = document.getElementById("placaCounter");
-const placaNoEncontrada = document.getElementById("placaNoEncontrada");
+// ── AUTOCOMPLETADO PLACA ──
+const inputPlaca       = document.getElementById("inputPlaca");
+const listaPlacas      = document.getElementById("listaPlacas");
+const selectMarca      = document.getElementById("selectMarca");
+const placaCounter     = document.getElementById("placaCounter");
+const placaNoEncontrada= document.getElementById("placaNoEncontrada");
 
-// ───────────────────────────────────────────────
-// Validación: solo caracteres alfanuméricos y máx 8
-// ───────────────────────────────────────────────
-inputPlaca.addEventListener("keypress", (e) => {
-  const char = String.fromCharCode(e.which || e.keyCode);
-  if (!/[A-Za-z0-9]/.test(char)) {
-    e.preventDefault(); // bloquea cualquier carácter no alfanumérico
-  }
+inputPlaca.addEventListener("keypress", e => {
+  if (!/[A-Za-z0-9]/.test(String.fromCharCode(e.which || e.keyCode))) e.preventDefault();
 });
 
-// También limpiar si el usuario pega texto
-inputPlaca.addEventListener("input", (e) => {
-  // Eliminar caracteres no alfanuméricos que puedan llegar por paste
-  let valor = e.target.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
-  // Respetar máximo de 8
+inputPlaca.addEventListener("input", e => {
+  let valor = e.target.value.replace(/[^A-Za-z0-9]/g, "").toUpperCase();
   if (valor.length > 8) valor = valor.slice(0, 8);
   inputPlaca.value = valor;
 
-  // Actualizar contador
   const len = valor.length;
-  placaCounter.textContent = `${len} / 8 caracteres`;
+  placaCounter.textContent = len + " / 8 caracteres";
   placaCounter.classList.toggle("lleno", len === 8);
-
-  // Resetear estado
   placaNoEncontrada.classList.remove("show");
   listaPlacas.style.display = "none";
   selectMarca.disabled = true;
-  selectMarca.innerHTML = '<option value="">Primero selecciona una placa</option>';
+  selectMarca.innerHTML = "<option value=''>Primero selecciona una placa</option>";
 
-  if (valor.length === 0) return;
+  if (!valor.length) return;
 
-  // Buscar coincidencias
-  const filtrados = vehiculosData.filter(v =>
-    v.placa.toUpperCase().includes(valor)
-  );
+  const filtrados = vehiculosData.filter(v => v.placa.toUpperCase().includes(valor));
 
   if (filtrados.length > 0) {
     listaPlacas.innerHTML = "";
     filtrados.forEach(vehiculo => {
       const item = document.createElement("div");
       item.className = "autocomplete-item";
-      item.innerHTML = `<strong>${vehiculo.placa}</strong> - ${vehiculo.marca}`;
+      item.innerHTML = "<strong>" + vehiculo.placa + "</strong> - " + vehiculo.marca;
       item.addEventListener("click", () => {
         inputPlaca.value = vehiculo.placa;
-        placaCounter.textContent = `${vehiculo.placa.length} / 8 caracteres`;
+        placaCounter.textContent = vehiculo.placa.length + " / 8 caracteres";
         placaCounter.classList.toggle("lleno", vehiculo.placa.length === 8);
-        selectMarca.innerHTML = `<option value="${vehiculo.marca}" selected>${vehiculo.marca}</option>`;
+        selectMarca.innerHTML = "<option value='" + vehiculo.marca + "' selected>" + vehiculo.marca + "</option>";
         selectMarca.disabled = false;
         listaPlacas.style.display = "none";
         placaNoEncontrada.classList.remove("show");
@@ -282,216 +330,174 @@ inputPlaca.addEventListener("input", (e) => {
     });
     listaPlacas.style.display = "block";
   } else {
-    // ── AVISO PLACA NO ENCONTRADA ──
     listaPlacas.style.display = "none";
     placaNoEncontrada.classList.add("show");
-    selectMarca.disabled = true;
-    selectMarca.innerHTML = '<option value="">Placa no encontrada</option>';
+    selectMarca.innerHTML = "<option value=''>Placa no encontrada</option>";
   }
 });
 
-// Cerrar lista al hacer clic fuera
-document.addEventListener("click", (e) => {
-  if (!e.target.closest(".autocomplete-container")) {
-    listaPlacas.style.display = "none";
-  }
+document.addEventListener("click", e => {
+  if (!e.target.closest(".autocomplete-container")) listaPlacas.style.display = "none";
 });
 
-function convertirBase64(file){
-  return new Promise((res,rej)=>{
-    const r=new FileReader();
-    r.onload=()=>res(r.result);
-    r.onerror=e=>rej(e);
-    r.readAsDataURL(file);
-  });
-}
-
-function preview(id,p){
-  document.getElementById(id).addEventListener("change",e=>{
-    const f=e.target.files[0];
-    if(f){
-      const r=new FileReader();
-      r.onload=x=>{
-        p.innerHTML=`<img src="${x.target.result}">`;
-        p.style.display="block";
-      };
-      r.readAsDataURL(f);
-    }
-  });
-}
-
-["Derecho","Izquierdo","Frente","Atras","Interior","Tablero","Licencia","Circulacion"]
-.forEach(f=>preview("foto"+f,document.getElementById("preview"+f)));
-
+// ── TIEMPO DE USO ──
 function mostrarTiempoUso(datos) {
-  const divTiempo = document.getElementById("tiempoUso");
-  
-  if (!datos.tiempoUso) {
-    divTiempo.style.display = "none";
-    return;
-  }
-  
-  const horas = Math.floor(datos.tiempoUso / 60);
+  const div = document.getElementById("tiempoUso");
+  if (!datos.tiempoUso) { div.style.display = "none"; return; }
+  const horas   = Math.floor(datos.tiempoUso / 60);
   const minutos = datos.tiempoUso % 60;
-  
-  let tiempoTexto = "";
-  if (horas > 0) {
-    tiempoTexto = `${horas} hora${horas !== 1 ? 's' : ''} y ${minutos} minuto${minutos !== 1 ? 's' : ''}`;
-  } else {
-    tiempoTexto = `${minutos} minuto${minutos !== 1 ? 's' : ''}`;
-  }
-  
-  divTiempo.innerHTML = `
-    <h3>⏱️ Control de Tiempo de Uso</h3>
-    <div class="detalle"><strong>Placa:</strong> ${datos.placa}</div>
-    <div class="detalle"><strong>Última ${datos.ultimoMovimiento}:</strong> ${datos.fechaUltimoRegistro} a las ${datos.horaUltimoRegistro}</div>
-    <div class="detalle"><strong>Movimiento actual:</strong> ${datos.movimientoActual}</div>
-    <div class="destacado">⏰ TIEMPO DE USO: ${tiempoTexto}</div>
-  `;
-  divTiempo.style.display = "block";
+  const texto   = horas > 0
+    ? horas + " hora" + (horas !== 1 ? "s" : "") + " y " + minutos + " minuto" + (minutos !== 1 ? "s" : "")
+    : minutos + " minuto" + (minutos !== 1 ? "s" : "");
+  div.innerHTML =
+    "<h3>Control de Tiempo de Uso</h3>" +
+    "<div class='detalle'><strong>Placa:</strong> " + datos.placa + "</div>" +
+    "<div class='detalle'><strong>Ultima " + datos.ultimoMovimiento + ":</strong> " + datos.fechaUltimoRegistro + " a las " + datos.horaUltimoRegistro + "</div>" +
+    "<div class='detalle'><strong>Movimiento actual:</strong> " + datos.movimientoActual + "</div>" +
+    "<div class='destacado'>TIEMPO DE USO: " + texto + "</div>";
+  div.style.display = "block";
 }
 
-document.getElementById("formDatos").addEventListener("submit",async e=>{
+// ── ENVIO DEL FORMULARIO ──
+document.getElementById("formDatos").addEventListener("submit", async e => {
   e.preventDefault();
-  const btn=document.getElementById("btnEnviar");
-  const res=document.getElementById("respuesta");
-  const divTiempo = document.getElementById("tiempoUso");
-  btn.disabled=true;
-  res.className="loading";
-  res.innerHTML="⏳ Enviando...";
-  divTiempo.style.display = "none";
-  
-  addDebug("📤 Iniciando envío de formulario...");
+  const btn = document.getElementById("btnEnviar");
+  const res = document.getElementById("respuesta");
 
-  // Validar que la placa tenga al menos 1 carácter alfanumérico válido
+  res.style.display = "none";
+  document.getElementById("tiempoUso").style.display = "none";
+  btn.disabled = true;
+  showProgress(true);
+  setProgress(5, "Validando datos...");
+
+  // Validar placa
   const placaVal = inputPlaca.value.trim();
   if (!/^[A-Z0-9]{1,8}$/.test(placaVal)) {
-    res.className="error";
-    res.innerHTML="❌ La placa debe contener solo letras y números (máx. 8 caracteres)";
-    addDebug("❌ Placa inválida", 'error');
-    btn.disabled=false;
+    res.className = "error";
+    res.innerHTML = "La placa debe contener solo letras y numeros (max. 8 caracteres)";
+    res.style.display = "block";
+    btn.disabled = false;
+    showProgress(false);
     return;
   }
 
-  const fotosRequeridas = ["fotoDerecho","fotoIzquierdo","fotoFrente","fotoAtras","fotoInterior","fotoTablero","fotoLicencia","fotoCirculacion"];
-  for (let foto of fotosRequeridas) {
-    if (!document.getElementById(foto).files[0]) {
-      res.className="error";
-      res.innerHTML="❌ Todas las fotografías son obligatorias";
-      addDebug(`❌ Falta la foto: ${foto}`, 'error');
-      btn.disabled=false;
+  // Validar fotos
+  const fotosIds = ["fotoDerecho","fotoIzquierdo","fotoFrente","fotoAtras",
+                    "fotoInterior","fotoTablero","fotoLicencia","fotoCirculacion"];
+  for (const id of fotosIds) {
+    if (!document.getElementById(id).files[0]) {
+      res.className = "error";
+      res.innerHTML = "Todas las fotografias son obligatorias";
+      res.style.display = "block";
+      btn.disabled = false;
+      showProgress(false);
       return;
     }
   }
-  
-  addDebug("✅ Todas las fotos validadas (8/8)", 'success');
 
-  try{
-    addDebug("📍 Obteniendo ubicación GPS...");
-    const ubicacion = await new Promise((ok,fail)=>{
+  try {
+    // GPS
+    setProgress(10, "Obteniendo ubicacion GPS...");
+    const ubicacion = await new Promise((ok, fail) => {
       navigator.geolocation.getCurrentPosition(
-        p=>{
-          addDebug(`✅ GPS obtenido: ${p.coords.latitude.toFixed(6)}, ${p.coords.longitude.toFixed(6)}`, 'success');
-          ok({lat:p.coords.latitude,lng:p.coords.longitude});
-        },
-        ()=>fail("GPS_DENEGADO"),
-        {enableHighAccuracy:true}
+        p => ok({ lat: p.coords.latitude, lng: p.coords.longitude }),
+        () => fail("GPS_DENEGADO"),
+        { enableHighAccuracy: true }
       );
     });
 
-    addDebug("🖼️ Convirtiendo fotos a base64...");
+    // Comprimir fotos una por una con progreso
+    const fotosComprimidas = {};
+    for (let i = 0; i < fotosIds.length; i++) {
+      const id  = fotosIds[i];
+      const pct = 15 + Math.round((i + 1) * (72 / fotosIds.length));
+      setProgress(pct, "Comprimiendo foto " + (i + 1) + " de " + fotosIds.length + "...");
+      fotosComprimidas[id] = await comprimirImagen(document.getElementById(id).files[0]);
+    }
 
-    // Leer campos individualmente con log de debug para detectar cuál falla
+    // Leer campos del formulario
     const getVal = (name) => {
       const el = document.querySelector('[name="' + name + '"]');
-      if (!el) { throw new Error("Campo '" + name + "' no encontrado en el DOM"); }
-      const val = el.value;
-      addDebug("📋 Campo '" + name + "' = \"" + val + "\"");
-      return val;
+      if (!el) throw new Error("Campo " + name + " no encontrado");
+      return el.value;
+    };
+    const marcaEl  = document.getElementById("selectMarca");
+    const marcaVal = (marcaEl && marcaEl.selectedIndex >= 0 && marcaEl.options[marcaEl.selectedIndex])
+      ? marcaEl.options[marcaEl.selectedIndex].value : "";
+
+    const data = {
+      fecha:            new Date().toLocaleDateString("es-MX"),
+      hora:             new Date().toLocaleTimeString("es-MX"),
+      movimiento:       getVal("movimiento"),
+      nombre:           getVal("nombre"),
+      usuario:          getVal("usuario"),
+      tienda:           getVal("tienda"),
+      placa:            inputPlaca.value,
+      marca_y_submarca: marcaVal,
+      kilometraje:      getVal("kilometraje"),
+      comentarios:      getVal("comentarios"),
+      latitud:          ubicacion.lat,
+      longitud:         ubicacion.lng,
+      fotoDerecho:      fotosComprimidas.fotoDerecho,
+      fotoIzquierdo:    fotosComprimidas.fotoIzquierdo,
+      fotoFrente:       fotosComprimidas.fotoFrente,
+      fotoAtras:        fotosComprimidas.fotoAtras,
+      fotoInterior:     fotosComprimidas.fotoInterior,
+      fotoTablero:      fotosComprimidas.fotoTablero,
+      fotoLicencia:     fotosComprimidas.fotoLicencia,
+      fotoCirculacion:  fotosComprimidas.fotoCirculacion
     };
 
-    // Marca: leer directamente por ID (evita problemas con disabled)
-    const marcaEl = document.getElementById("selectMarca");
-    const marcaVal = marcaEl && marcaEl.selectedIndex >= 0
-      ? (marcaEl.options[marcaEl.selectedIndex] ? marcaEl.options[marcaEl.selectedIndex].value : "")
-      : "";
-    addDebug("📋 Campo 'marca_y_submarca' = \"" + marcaVal + "\"");
-
-    const data={
-      fecha:new Date().toLocaleDateString("es-MX"),
-      hora:new Date().toLocaleTimeString("es-MX"),
-      movimiento:getVal("movimiento"),
-      nombre:getVal("nombre"),
-      usuario:getVal("usuario"),
-      tienda:getVal("tienda"),
-      placa:inputPlaca.value,
-      marca_y_submarca:marcaVal,
-      kilometraje:getVal("kilometraje"),
-      comentarios:getVal("comentarios"),
-      latitud:ubicacion.lat,
-      longitud:ubicacion.lng,
-      fotoDerecho: await convertirBase64(document.getElementById("fotoDerecho").files[0]),
-      fotoIzquierdo: await convertirBase64(document.getElementById("fotoIzquierdo").files[0]),
-      fotoFrente: await convertirBase64(document.getElementById("fotoFrente").files[0]),
-      fotoAtras: await convertirBase64(document.getElementById("fotoAtras").files[0]),
-      fotoInterior: await convertirBase64(document.getElementById("fotoInterior").files[0]),
-      fotoTablero: await convertirBase64(document.getElementById("fotoTablero").files[0]),
-      fotoLicencia: await convertirBase64(document.getElementById("fotoLicencia").files[0]),
-      fotoCirculacion: await convertirBase64(document.getElementById("fotoCirculacion").files[0])
-    };
-    
-    addDebug("✅ Fotos convertidas correctamente", 'success');
-    addDebug(`📨 Enviando datos: ${data.placa} - ${data.movimiento}`);
-
-    const response = await fetch(webAppUrl,{
-      method:"POST",
-      body:JSON.stringify(data)
-    });
-    
-    addDebug("📥 Respuesta recibida del servidor");
+    setProgress(90, "Enviando al servidor...");
+    const response  = await fetch(webAppUrl, { method: "POST", body: JSON.stringify(data) });
     const resultado = await response.json();
-    addDebug(`Resultado: ${JSON.stringify(resultado)}`);
+    setProgress(100, "Completado!");
+    setTimeout(() => showProgress(false), 1200);
 
     if (resultado.success) {
-      res.className="success";
-      res.innerHTML="✅ Registro enviado correctamente";
-      addDebug("🎉 ¡Registro guardado exitosamente en Google Sheets!", 'success');
-      
+      res.className = "success";
+      res.innerHTML = "Registro enviado correctamente";
+      res.style.display = "block";
+
       if (resultado.tiempoUso !== undefined) {
         mostrarTiempoUso({
-          placa: data.placa,
-          tiempoUso: resultado.tiempoUso,
-          ultimoMovimiento: resultado.ultimoMovimiento,
+          placa:               data.placa,
+          tiempoUso:           resultado.tiempoUso,
+          ultimoMovimiento:    resultado.ultimoMovimiento,
           fechaUltimoRegistro: resultado.fechaUltimoRegistro,
-          horaUltimoRegistro: resultado.horaUltimoRegistro,
-          movimientoActual: data.movimiento
+          horaUltimoRegistro:  resultado.horaUltimoRegistro,
+          movimientoActual:    data.movimiento
         });
       }
-      
+
+      // Limpiar formulario
       document.getElementById("formDatos").reset();
       inputPlaca.value = "";
       placaCounter.textContent = "0 / 8 caracteres";
       placaCounter.classList.remove("lleno");
       placaNoEncontrada.classList.remove("show");
       selectMarca.disabled = true;
-      selectMarca.innerHTML = '<option value="">Primero selecciona una placa</option>';
-      document.querySelectorAll(".file-preview").forEach(p=>p.style.display="none");
+      selectMarca.innerHTML = "<option value=''>Primero selecciona una placa</option>";
+      document.querySelectorAll(".file-preview").forEach(p => p.style.display = "none");
+
     } else {
       throw new Error(resultado.error || "Error al enviar");
     }
 
-  }catch(err){
-    addDebug(`❌ ERROR: ${err.message || err}`, 'error');
+  } catch (err) {
+    showProgress(false);
     if (err === "GPS_DENEGADO") {
       document.getElementById("gpsWarning").classList.add("show");
-      res.className="error";
-      res.innerHTML="❌ Debes permitir la ubicación para enviar";
+      res.className = "error";
+      res.innerHTML = "Debes permitir la ubicacion para enviar";
     } else {
-      res.className="error";
-      res.innerHTML="❌ Error: " + (err.message || err);
+      res.className = "error";
+      res.innerHTML = "Error: " + (err.message || err);
     }
+    res.style.display = "block";
   }
-  btn.disabled=false;
+
+  btn.disabled = false;
 });
 </script>
 

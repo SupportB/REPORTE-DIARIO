@@ -39,59 +39,70 @@ button:disabled{background:#aaa;cursor:not-allowed}
 .tiempo-uso .detalle strong{color:#f57f17}
 .tiempo-uso .destacado{font-size:24px;font-weight:bold;color:#e65100;margin-top:15px;padding:10px;background:#fff;border-radius:6px;text-align:center}
 
-/* ── BARRA DE PROGRESO ── */
-#progressWrap{
-  display:none;
-  margin-top:20px;
-  background:#e8f5e9;
-  border:1px solid #00a64f;
-  border-radius:10px;
-  padding:16px 20px;
+/* ── TIENDA BUSCADOR ── */
+.tienda-container{position:relative}
+.tienda-search-wrap{position:relative}
+.tienda-search-wrap input{
+  padding-right:36px;
 }
-#progressWrap.show{display:block}
-#progressLabel{
-  font-size:14px;
-  font-weight:bold;
-  color:#006b37;
-  margin-bottom:8px;
-  text-align:center;
-}
-#progressBar{
-  width:100%;
-  height:22px;
-  background:#c8e6c9;
-  border-radius:20px;
-  overflow:hidden;
-}
-#progressFill{
-  height:100%;
-  width:0%;
-  background:linear-gradient(90deg,#00a64f,#00c060);
-  border-radius:20px;
-  transition:width 0.4s ease;
-  position:relative;
-  overflow:hidden;
-}
-#progressFill::after{
-  content:'';
+.tienda-search-icon{
   position:absolute;
-  top:0;left:-60%;
-  width:50%;height:100%;
-  background:rgba(255,255,255,0.35);
-  transform:skewX(-20deg);
-  animation:shimmer 1.2s infinite;
+  right:12px;top:50%;
+  transform:translateY(-50%);
+  color:#00a64f;font-size:16px;
+  pointer-events:none;
 }
-@keyframes shimmer{
-  0%{left:-60%}
-  100%{left:120%}
+.tienda-list{
+  position:absolute;top:100%;left:0;right:0;
+  max-height:220px;overflow-y:auto;
+  background:#fff;
+  border:2px solid #00a64f;border-top:none;
+  border-radius:0 0 8px 8px;
+  z-index:200;display:none;
+  box-shadow:0 4px 12px rgba(0,166,79,0.15);
 }
-#progressPct{
-  text-align:center;
-  font-size:13px;
-  color:#00695c;
-  font-weight:bold;
-  margin-top:6px;
+.tienda-list.show{display:block}
+.tienda-item{
+  padding:12px 14px;cursor:pointer;
+  border-bottom:1px solid #e8f5e9;
+  font-size:15px;color:#333;
+  transition:background 0.15s;
 }
+.tienda-item:hover,.tienda-item.selected-item{background:#e8f5e9;color:#006b37;font-weight:bold}
+.tienda-item:last-child{border-bottom:none}
+.tienda-item mark{background:#c8f7dc;color:#005c2e;border-radius:2px;padding:0 2px}
+.tienda-selected{
+  display:none;margin-top:6px;
+  padding:8px 12px;
+  background:#e8f5e9;border:2px solid #00a64f;
+  border-radius:6px;color:#006b37;
+  font-size:14px;font-weight:bold;
+  align-items:center;justify-content:space-between;gap:8px;
+}
+.tienda-selected.show{display:flex}
+.tienda-selected button{
+  margin:0;width:auto;padding:4px 10px;
+  font-size:12px;border-radius:4px;background:#e53935;
+}
+.tienda-no-result{
+  padding:12px 14px;color:#888;font-style:italic;font-size:14px;
+}
+/* Input oculto para validación */
+#inputTiendaHidden{display:none !important}
+
+/* Spinner */
+.select-loading{color:#888;font-size:13px;margin-top:4px;display:none}
+.select-loading.show{display:block}
+
+/* ── BARRA DE PROGRESO ── */
+#progressWrap{display:none;margin-top:20px;background:#e8f5e9;border:1px solid #00a64f;border-radius:10px;padding:16px 20px;}
+#progressWrap.show{display:block}
+#progressLabel{font-size:14px;font-weight:bold;color:#006b37;margin-bottom:8px;text-align:center;}
+#progressBar{width:100%;height:22px;background:#c8e6c9;border-radius:20px;overflow:hidden;}
+#progressFill{height:100%;width:0%;background:linear-gradient(90deg,#00a64f,#00c060);border-radius:20px;transition:width 0.4s ease;position:relative;overflow:hidden;}
+#progressFill::after{content:'';position:absolute;top:0;left:-60%;width:50%;height:100%;background:rgba(255,255,255,0.35);transform:skewX(-20deg);animation:shimmer 1.2s infinite;}
+@keyframes shimmer{0%{left:-60%}100%{left:120%}}
+#progressPct{text-align:center;font-size:13px;color:#00695c;font-weight:bold;margin-top:6px;}
 </style>
 </head>
 
@@ -122,11 +133,30 @@ button:disabled{background:#aaa;cursor:not-allowed}
 <label>Nombre <span class="required">*</span></label>
 <input name="nombre" required>
 
-<label>Usuario <span class="required">*</span></label>
-<input name="usuario" required>
+<label>USUARIO BETA <span class="required">*</span></label>
+<input name="usuario" required placeholder="Ej. BMEXS0001">
 
+<!-- ── TIENDA: buscador + lista filtrada ── -->
 <label>Tienda <span class="required">*</span></label>
-<input name="tienda" required>
+<div class="tienda-container" id="tiendaContainer">
+  <div class="tienda-search-wrap">
+    <input
+      type="text"
+      id="inputBuscarTienda"
+      autocomplete="off"
+      placeholder="🔍 Buscar tienda..."
+    >
+    <span class="tienda-search-icon">🔍</span>
+  </div>
+  <div class="tienda-list" id="listaTiendas"></div>
+  <div class="tienda-selected" id="tiendaSeleccionada">
+    <span id="tiendaSeleccionadaTexto"></span>
+    <button type="button" id="btnClearTienda" title="Cambiar tienda">✕ Cambiar</button>
+  </div>
+  <!-- campo oculto que guarda el valor real para el submit -->
+  <input type="text" id="inputTiendaHidden" name="tienda" required readonly tabindex="-1">
+</div>
+<div class="select-loading" id="tiendasLoading">⏳ Cargando lista de tiendas...</div>
 
 <label>Placa <span class="required">*</span></label>
 <div class="autocomplete-container">
@@ -153,11 +183,8 @@ button:disabled{background:#aaa;cursor:not-allowed}
   <option value="">Primero selecciona una placa</option>
 </select>
 
-<label>Kilometraje <span class="required">*</span></label>
-<input type="number" name="kilometraje" required>
-
-<label>Comentarios <span class="required">*</span></label>
-<textarea name="comentarios" required></textarea>
+<label>Comentarios</label>
+<textarea name="comentarios"></textarea>
 </div>
 
 <div class="form-section">
@@ -212,8 +239,9 @@ button:disabled{background:#aaa;cursor:not-allowed}
 </div>
 
 <script>
-const webAppUrl = "https://script.google.com/macros/s/AKfycbz9fRKYgIxDe6o9gTJyolc32RAZs-3I-J-FJk3z8SMDHt2l7RcUssdQnlzVa5bUPgAR/exec";
+const webAppUrl = "https://script.google.com/macros/s/AKfycbz8Fm5qSFvAZzAfEUazRLRlzqy5YfzL4uQTq_YgnBKZdQCVi8_PslOeFguP44ehZRhv/exec";
 let vehiculosData = [];
+let tiendasData   = [];
 
 // ── PROGRESO ──
 function setProgress(pct, label) {
@@ -223,11 +251,10 @@ function setProgress(pct, label) {
 }
 function showProgress(show) {
   document.getElementById("progressWrap").classList.toggle("show", show);
-  if (!show) { setProgress(0, "Preparando envio..."); }
+  if (!show) setProgress(0, "Preparando envio...");
 }
 
-// ── COMPRESION DE IMAGEN CON CANVAS ──
-// Redimensiona a max 800px lado mayor + calidad JPEG 0.4 -> reduce ~85-90% el peso
+// ── COMPRESION DE IMAGEN ──
 function comprimirImagen(file, maxSize = 800, quality = 0.4) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -240,8 +267,7 @@ function comprimirImagen(file, maxSize = 800, quality = 0.4) {
         let w = img.width, h = img.height;
         if (w > h && w > maxSize) { h = Math.round(h * maxSize / w); w = maxSize; }
         else if (h > maxSize)     { w = Math.round(w * maxSize / h); h = maxSize; }
-        canvas.width  = w;
-        canvas.height = h;
+        canvas.width = w; canvas.height = h;
         canvas.getContext("2d").drawImage(img, 0, 0, w, h);
         resolve(canvas.toDataURL("image/jpeg", quality));
       };
@@ -265,6 +291,90 @@ function preview(id, p) {
 ["Derecho","Izquierdo","Frente","Atras","Interior","Tablero","Licencia","Circulacion"]
   .forEach(f => preview("foto" + f, document.getElementById("preview" + f)));
 
+// ── BUSCADOR DE TIENDAS ──
+const inputBuscar        = document.getElementById("inputBuscarTienda");
+const listaTiendasEl     = document.getElementById("listaTiendas");
+const tiendaSeleccionada = document.getElementById("tiendaSeleccionada");
+const tiendaTexto        = document.getElementById("tiendaSeleccionadaTexto");
+const inputTiendaHidden  = document.getElementById("inputTiendaHidden");
+const btnClearTienda     = document.getElementById("btnClearTienda");
+
+function resaltarTexto(texto, busqueda) {
+  if (!busqueda) return texto;
+  const re = new RegExp("(" + busqueda.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")", "gi");
+  return texto.replace(re, "<mark>$1</mark>");
+}
+
+function renderTiendas(filtro) {
+  listaTiendasEl.innerHTML = "";
+  const lista = filtro
+    ? tiendasData.filter(t => t.toLowerCase().includes(filtro.toLowerCase()))
+    : tiendasData;
+
+  if (lista.length === 0) {
+    listaTiendasEl.innerHTML = "<div class='tienda-no-result'>No se encontraron tiendas</div>";
+  } else {
+    lista.forEach(t => {
+      const item = document.createElement("div");
+      item.className = "tienda-item";
+      item.innerHTML = resaltarTexto(t, filtro);
+      item.addEventListener("click", () => seleccionarTienda(t));
+      listaTiendasEl.appendChild(item);
+    });
+  }
+  listaTiendasEl.classList.add("show");
+}
+
+function seleccionarTienda(nombre) {
+  inputTiendaHidden.value = nombre;
+  tiendaTexto.textContent = "✅ " + nombre;
+  tiendaSeleccionada.classList.add("show");
+  inputBuscar.value = "";
+  listaTiendasEl.classList.remove("show");
+  inputBuscar.style.display = "none";
+  document.querySelector(".tienda-search-icon").style.display = "none";
+}
+
+function limpiarTienda() {
+  inputTiendaHidden.value = "";
+  tiendaSeleccionada.classList.remove("show");
+  inputBuscar.value = "";
+  inputBuscar.style.display = "";
+  document.querySelector(".tienda-search-icon").style.display = "";
+  listaTiendasEl.classList.remove("show");
+  inputBuscar.focus();
+}
+
+inputBuscar.addEventListener("focus", () => {
+  if (tiendasData.length > 0) renderTiendas(inputBuscar.value);
+});
+
+inputBuscar.addEventListener("input", () => {
+  renderTiendas(inputBuscar.value);
+});
+
+btnClearTienda.addEventListener("click", limpiarTienda);
+
+document.addEventListener("click", e => {
+  if (!e.target.closest("#tiendaContainer")) listaTiendasEl.classList.remove("show");
+});
+
+// ── CARGA DE TIENDAS ──
+async function cargarTiendas() {
+  const loading = document.getElementById("tiendasLoading");
+  loading.classList.add("show");
+  try {
+    const response = await fetch(webAppUrl + "?action=getTiendas");
+    const data = await response.json();
+    tiendasData = data.map(t => typeof t === "string" ? t : (t.tienda || t.nombre || String(t)));
+  } catch (e) {
+    inputBuscar.placeholder = "⚠️ Error al cargar tiendas";
+    console.error("Error cargando tiendas:", e);
+  } finally {
+    loading.classList.remove("show");
+  }
+}
+
 // ── CARGA INICIAL ──
 window.addEventListener("load", async () => {
   try {
@@ -275,20 +385,25 @@ window.addEventListener("load", async () => {
         { enableHighAccuracy: true }
       );
     });
-  } catch (e) { /* GPS denegado, se avisara al enviar */ }
+  } catch (e) {}
 
-  try {
-    const response = await fetch(webAppUrl + "?action=getVehiculos");
-    vehiculosData = await response.json();
-  } catch (e) { console.error("Error cargando vehiculos:", e); }
+  await Promise.all([
+    (async () => {
+      try {
+        const r = await fetch(webAppUrl + "?action=getVehiculos");
+        vehiculosData = await r.json();
+      } catch (e) { console.error("Error cargando vehiculos:", e); }
+    })(),
+    cargarTiendas()
+  ]);
 });
 
 // ── AUTOCOMPLETADO PLACA ──
-const inputPlaca       = document.getElementById("inputPlaca");
-const listaPlacas      = document.getElementById("listaPlacas");
-const selectMarca      = document.getElementById("selectMarca");
-const placaCounter     = document.getElementById("placaCounter");
-const placaNoEncontrada= document.getElementById("placaNoEncontrada");
+const inputPlaca        = document.getElementById("inputPlaca");
+const listaPlacas       = document.getElementById("listaPlacas");
+const selectMarca       = document.getElementById("selectMarca");
+const placaCounter      = document.getElementById("placaCounter");
+const placaNoEncontrada = document.getElementById("placaNoEncontrada");
 
 inputPlaca.addEventListener("keypress", e => {
   if (!/[A-Za-z0-9]/.test(String.fromCharCode(e.which || e.keyCode))) e.preventDefault();
@@ -370,6 +485,16 @@ document.getElementById("formDatos").addEventListener("submit", async e => {
   showProgress(true);
   setProgress(5, "Validando datos...");
 
+  // Validar tienda
+  if (!inputTiendaHidden.value) {
+    res.className = "error";
+    res.innerHTML = "Debes seleccionar una tienda";
+    res.style.display = "block";
+    btn.disabled = false;
+    showProgress(false);
+    return;
+  }
+
   // Validar placa
   const placaVal = inputPlaca.value.trim();
   if (!/^[A-Z0-9]{1,8}$/.test(placaVal)) {
@@ -396,7 +521,6 @@ document.getElementById("formDatos").addEventListener("submit", async e => {
   }
 
   try {
-    // GPS
     setProgress(10, "Obteniendo ubicacion GPS...");
     const ubicacion = await new Promise((ok, fail) => {
       navigator.geolocation.getCurrentPosition(
@@ -406,7 +530,6 @@ document.getElementById("formDatos").addEventListener("submit", async e => {
       );
     });
 
-    // Comprimir fotos una por una con progreso
     const fotosComprimidas = {};
     for (let i = 0; i < fotosIds.length; i++) {
       const id  = fotosIds[i];
@@ -415,7 +538,6 @@ document.getElementById("formDatos").addEventListener("submit", async e => {
       fotosComprimidas[id] = await comprimirImagen(document.getElementById(id).files[0]);
     }
 
-    // Leer campos del formulario
     const getVal = (name) => {
       const el = document.querySelector('[name="' + name + '"]');
       if (!el) throw new Error("Campo " + name + " no encontrado");
@@ -431,10 +553,9 @@ document.getElementById("formDatos").addEventListener("submit", async e => {
       movimiento:       getVal("movimiento"),
       nombre:           getVal("nombre"),
       usuario:          getVal("usuario"),
-      tienda:           getVal("tienda"),
+      tienda:           inputTiendaHidden.value,
       placa:            inputPlaca.value,
       marca_y_submarca: marcaVal,
-      kilometraje:      getVal("kilometraje"),
       comentarios:      getVal("comentarios"),
       latitud:          ubicacion.lat,
       longitud:         ubicacion.lng,
@@ -479,6 +600,7 @@ document.getElementById("formDatos").addEventListener("submit", async e => {
       selectMarca.disabled = true;
       selectMarca.innerHTML = "<option value=''>Primero selecciona una placa</option>";
       document.querySelectorAll(".file-preview").forEach(p => p.style.display = "none");
+      limpiarTienda();
 
     } else {
       throw new Error(resultado.error || "Error al enviar");
